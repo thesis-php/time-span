@@ -1,6 +1,6 @@
 {
-    "name": "thesis/template",
-    "description": "Thesis Template",
+    "name": "thesis/time",
+    "description": "Thesis Time",
     "license": "MIT",
     "type": "library",
     "authors": [
@@ -14,7 +14,9 @@
         }
     ],
     "require": {
-        "php": "^8.3"
+        "php": "^8.3",
+        "psr/clock": "^1.0",
+        "symfony/polyfill-php84": "^1.31"
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.8.2",
@@ -23,12 +25,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Thesis\\Template\\": "src/"
+            "Thesis\\Time\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Thesis\\Template\\": "tests/"
+            "Thesis\\Time\\": "tests/"
         }
     },
     "config": {
