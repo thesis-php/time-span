@@ -16,7 +16,7 @@ final readonly class TimeSpan
     private const int MULT_HOURS = self::MULT_MINUTES * 60;
     private const int MULT_DAYS = self::MULT_HOURS * 24;
 
-    public static function timeDiff(\DateTimeImmutable $a, \DateTimeImmutable $b): self
+    public static function diff(\DateTimeImmutable $a, \DateTimeImmutable $b): self
     {
         return new self((int) $a->format('Uv') - (int) $b->format('Uv'));
     }
