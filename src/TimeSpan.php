@@ -35,7 +35,7 @@ final readonly class TimeSpan
             + $minutes * self::MULT_MINUTES
             + $seconds * self::MULT_SECONDS
             + $milliseconds * self::MULT_MILLISECONDS
-            + $microseconds * self::MULT_MICROSECONDS,
+            + $microseconds,
         );
     }
 
