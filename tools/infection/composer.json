@@ -8,7 +8,7 @@
         },
         "bump-after-update": "dev",
         "platform": {
-            "php": "8.3"
+            "php": "8.3.17"
         },
         "sort-packages": true
     }
