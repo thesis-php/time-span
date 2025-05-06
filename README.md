@@ -10,3 +10,23 @@
 ```shell
 composer require thesis/time
 ```
+
+## `Thesis\Time\WallClock`
+
+A simple implementation of the [`Psr\Clock\ClockInterface`](https://www.php-fig.org/psr/psr-20/) that returns the current wall-clock time.
+
+```php
+use Thesis\Time\WallClock;
+
+$clock = new WallClock();
+
+echo $clock->now()->format('c'); // Outputs current time in ISO 8601 format
+```
+
+Or with a specific timezone:
+
+```php
+$clock = new WallClock(new \DateTimeZone('Europe/Moscow'));
+
+echo $clock->now()->format('c'); // Outputs Moscow time in ISO 8601 format
+```
