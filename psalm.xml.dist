@@ -14,6 +14,7 @@
     reportMixedIssues="true"
     sealAllMethods="true"
     sealAllProperties="true"
+    strictBinaryOperands="false"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config tools/psalm/vendor/vimeo/psalm/config.xsd"
@@ -40,6 +41,7 @@
     </ignoreExceptions>
 
     <issueHandlers>
+        <MissingOverrideAttribute errorLevel="suppress"/>
         <PluginIssue name="UnspecifiedVisibility">
             <errorLevel type="suppress">
                 <directory name="tests"/>
