@@ -13,6 +13,8 @@ final class TimeSpanTest extends TestCase
 {
     #[TestWith(['@123.00333', '@124.00555', -1_002_220])]
     #[TestWith(['@124.00555', '@123.00333', 1_002_220])]
+    #[TestWith(['2021-10-31 08:30:00 Europe/London', '2021-10-30 09:00:00 Europe/London', 88_200_000_000])]
+    #[TestWith(['2021-10-31 09:00:00 Europe/London', '2021-10-30 09:00:00 Europe/London', 90_000_000_000])]
     public function testDiff(string $a, string $b, int $expectedDiffUs): void
     {
         $diff = TimeSpan::diff(new \DateTimeImmutable($a), new \DateTimeImmutable($b));
@@ -64,6 +66,52 @@ final class TimeSpanTest extends TestCase
         $timeSpan = TimeSpan::from(...$args);
 
         self::assertSame($expected, $timeSpan->toMicroseconds());
+    }
+
+    #[TestWith(['P1W2D', 777_600_000_000])]
+    #[TestWith(['P7D', 604_800_000_000])]
+    #[TestWith(['PT2S', 2_000_000])]
+    public function testFromInterval(string $interval, int $expected): void
+    {
+        $timeSpan = TimeSpan::fromInterval(new \DateInterval($interval));
+
+        self::assertSame($expected, $timeSpan->toMicroseconds());
+    }
+
+    #[TestWith(['P1Y2M'])]
+    #[TestWith(['P1Y'])]
+    #[TestWith(['P2M'])]
+    public function testItThrowsForInvalidInterval(string $interval): void
+    {
+        $this->expectExceptionObject(
+            new \InvalidArgumentException(
+                \sprintf(
+                    'Month and year cannot be converted to microseconds correctly. Use `%s::diff()` instead.',
+                    TimeSpan::class,
+                ),
+            ),
+        );
+
+        TimeSpan::fromInterval(new \DateInterval($interval));
+    }
+
+    public function testItThrowsForDateTimeInterfaceDiffInterval(): void
+    {
+        $originalTime = new \DateTimeImmutable('2021-10-30 09:00:00 Europe/London');
+        $targetTime = new \DateTimeImmutable('2021-10-31 09:00:00 Europe/London');
+        $interval = $originalTime->diff($targetTime);
+
+        $this->expectExceptionObject(
+            new \InvalidArgumentException(
+                \sprintf(
+                    'Detected `%s::diff()`. Use `%s::diff()` instead.',
+                    \DateTimeInterface::class,
+                    TimeSpan::class,
+                ),
+            ),
+        );
+
+        TimeSpan::fromInterval($interval);
     }
 
     #[TestWith([100, 100])]
