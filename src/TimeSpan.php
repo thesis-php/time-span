@@ -9,7 +9,8 @@ namespace Thesis\Time;
  */
 final readonly class TimeSpan
 {
-    private const int MULT_MICROSECONDS = 1;
+    private const int MULT_NANOSECONDS = 1;
+    private const int MULT_MICROSECONDS = self::MULT_NANOSECONDS * 1000;
     private const int MULT_MILLISECONDS = self::MULT_MICROSECONDS * 1000;
     private const int MULT_SECONDS = self::MULT_MILLISECONDS * 1000;
     private const int MULT_MINUTES = self::MULT_SECONDS * 60;
@@ -18,7 +19,7 @@ final readonly class TimeSpan
 
     public static function diff(\DateTimeImmutable $a, \DateTimeImmutable $b): self
     {
-        return new self((int) $a->format('Uu') - (int) $b->format('Uu'));
+        return new self((int) $a->format('Uu') * 1000 - (int) $b->format('Uu') * 1000);
     }
 
     public static function from(
@@ -28,15 +29,22 @@ final readonly class TimeSpan
         int|float $seconds = 0,
         int|float $milliseconds = 0,
         int|float $microseconds = 0,
+        int|float $nanoseconds = 0,
     ): self {
-        return self::fromMicroseconds(
+        return self::fromNanoseconds(
             $days * self::MULT_DAYS
             + $hours * self::MULT_HOURS
             + $minutes * self::MULT_MINUTES
             + $seconds * self::MULT_SECONDS
             + $milliseconds * self::MULT_MILLISECONDS
-            + $microseconds,
+            + $microseconds * self::MULT_MICROSECONDS
+            + $nanoseconds,
         );
+    }
+
+    public static function fromNanoseconds(int|float $nanoseconds): self
+    {
+        return new self(self::fromX($nanoseconds, self::MULT_NANOSECONDS));
     }
 
     public static function fromMicroseconds(int|float $microseconds): self
@@ -82,12 +90,22 @@ final readonly class TimeSpan
     }
 
     private function __construct(
-        private int $microseconds,
+        private int $nanoseconds,
     ) {}
 
-    public function toMicroseconds(): int
+    public function toNanoseconds(): int
     {
-        return $this->microseconds;
+        return $this->nanoseconds;
+    }
+
+    /**
+     * @phpstan-param PHP_ROUND_HALF_UP|PHP_ROUND_HALF_DOWN|PHP_ROUND_HALF_EVEN|PHP_ROUND_HALF_ODD $roundingMode
+     * @psalm-param positive-int $roundingMode
+     * @return ($precision is positive-int ? float : int)
+     */
+    public function toMicroseconds(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
+    {
+        return $this->toX(self::MULT_MICROSECONDS, $precision, $roundingMode);
     }
 
     /**
@@ -149,7 +167,7 @@ final readonly class TimeSpan
     private function toX(int $multiplier, int $precision, int $roundingMode): int|float
     {
         $value = round(
-            num: $this->microseconds / $multiplier,
+            num: $this->nanoseconds / $multiplier,
             precision: $precision,
             mode: $roundingMode,
         );
