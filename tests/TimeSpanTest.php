@@ -40,6 +40,10 @@ final class TimeSpanTest extends TestCase
         650_975_222_000,
     ])]
     #[TestWith([
+        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'nanoseconds' => 10000],
+        650_975_222_010,
+    ])]
+    #[TestWith([
         ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35],
         650_975_000_000,
     ])]
@@ -60,6 +64,17 @@ final class TimeSpanTest extends TestCase
         $timeSpan = TimeSpan::from(...$args);
 
         self::assertSame($expected, $timeSpan->toMicroseconds());
+    }
+
+    #[TestWith([100, 100])]
+    #[TestWith([100.1, 100])]
+    #[TestWith([100.5, 101])]
+    #[TestWith([100.99_999, 101])]
+    public function testFromNanoseconds(int|float $nanoseconds, int $expected): void
+    {
+        $span = TimeSpan::fromNanoseconds($nanoseconds);
+
+        self::assertSame($expected, $span->toNanoseconds());
     }
 
     #[TestWith([100, 100])]
@@ -126,6 +141,18 @@ final class TimeSpanTest extends TestCase
         $span = TimeSpan::fromDays($days);
 
         self::assertSame($expected, $span->toMicroseconds());
+    }
+
+    #[TestWith([100_000_000, 100.0, 100])]
+    #[TestWith([100_100_000, 100.1, 100])]
+    #[TestWith([100_500_000, 100.5, 101])]
+    #[TestWith([100_999_000, 101.0, 101])]
+    public function testToMicroseconds(int $nanoseconds, float $expectedWithPositivePrecision, int $expectedWithLessOrEqualZeroPrecision): void
+    {
+        $span = TimeSpan::fromNanoseconds($nanoseconds);
+
+        self::assertSame($expectedWithPositivePrecision, $span->toMilliseconds(1));
+        self::assertSame($expectedWithLessOrEqualZeroPrecision, $span->toMilliseconds());
     }
 
     #[TestWith([100_000, 100.0, 100])]
