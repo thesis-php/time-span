@@ -86,7 +86,7 @@ final class TimeSpanTest extends TestCase
         $this->expectExceptionObject(
             new \InvalidArgumentException(
                 \sprintf(
-                    'Month and year cannot be converted to microseconds correctly. Use `%s::diff()` instead.',
+                    'Month and year cannot be converted to nanoseconds correctly. Use `%s::diff()` instead.',
                     TimeSpan::class,
                 ),
             ),
@@ -104,7 +104,7 @@ final class TimeSpanTest extends TestCase
         $this->expectExceptionObject(
             new \InvalidArgumentException(
                 \sprintf(
-                    'Detected `%s::diff()`. Use `%s::diff()` instead.',
+                    'Given interval was obtained from `%s::diff()` and cannot be interpreted correctly due to DST changeovers. Use `%s::diff()` instead.',
                     \DateTimeInterface::class,
                     TimeSpan::class,
                 ),
