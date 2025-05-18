@@ -26,46 +26,46 @@ final class TimeSpanTest extends TestCase
      * @param array{days?: float|int, hours?: float|int, minutes?: float|int, seconds?: float|int, milliseconds?: float|int, microseconds?: float|int} $args
      */
     #[TestWith([
-        ['seconds' => 987, 'milliseconds' => 654, 'microseconds' => 321],
-        987_654_321,
+        ['seconds' => 987, 'milliseconds' => 654, 'microseconds' => 321, 'nanoseconds' => 123],
+        987_654_321_123,
     ])]
     #[TestWith([
-        ['milliseconds' => -1.555, 'microseconds' => -445],
-        -2000,
+        ['milliseconds' => -1.555, 'microseconds' => -445, 'nanoseconds' => -123],
+        -2_000_123,
     ])]
     #[TestWith([
-        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'microseconds' => 333],
-        650_975_222_333,
-    ])]
-    #[TestWith([
-        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222],
-        650_975_222_000,
+        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'microseconds' => 333, 'nanoseconds' => 123],
+        650_975_222_333_123,
     ])]
     #[TestWith([
         ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'nanoseconds' => 10000],
-        650_975_222_010,
+        650_975_222_010_000,
+    ])]
+    #[TestWith([
+        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222],
+        650_975_222_000_000,
     ])]
     #[TestWith([
         ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35],
-        650_975_000_000,
+        650_975_000_000_000,
     ])]
     #[TestWith([
         ['days' => 7, 'hours' => 12, 'minutes' => 49],
-        650_940_000_000,
+        650_940_000_000_000,
     ])]
     #[TestWith([
         ['days' => 7, 'hours' => 12],
-        648_000_000_000,
+        648_000_000_000_000,
     ])]
     #[TestWith([
         ['days' => 7],
-        604_800_000_000,
+        604_800_000_000_000,
     ])]
     public function testFrom(array $args, int $expected): void
     {
         $timeSpan = TimeSpan::from(...$args);
 
-        self::assertSame($expected, $timeSpan->toMicroseconds());
+        self::assertSame($expected, $timeSpan->toNanoseconds());
     }
 
     #[TestWith(['P1W2D', 777_600_000_000])]
