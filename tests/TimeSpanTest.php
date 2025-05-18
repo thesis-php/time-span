@@ -78,6 +78,19 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expected, $timeSpan->toMicroseconds());
     }
 
+    #[TestWith(['P1W2D', -777_600_000_000])]
+    #[TestWith(['P7D', -604_800_000_000])]
+    #[TestWith(['PT2S', -2_000_000])]
+    public function testFromIntervalInvert(string $interval, int $expected): void
+    {
+        $dateInterval = new \DateInterval($interval);
+        $dateInterval->invert = 1;
+
+        $timeSpan = TimeSpan::fromInterval($dateInterval);
+
+        self::assertSame($expected, $timeSpan->toMicroseconds());
+    }
+
     #[TestWith(['P1Y2M'])]
     #[TestWith(['P1Y'])]
     #[TestWith(['P2M'])]
@@ -189,18 +202,6 @@ final class TimeSpanTest extends TestCase
         $span = TimeSpan::fromDays($days);
 
         self::assertSame($expected, $span->toMicroseconds());
-    }
-
-    #[TestWith([100_000_000, 100.0, 100])]
-    #[TestWith([100_100_000, 100.1, 100])]
-    #[TestWith([100_500_000, 100.5, 101])]
-    #[TestWith([100_999_000, 101.0, 101])]
-    public function testToMicroseconds(int $nanoseconds, float $expectedWithPositivePrecision, int $expectedWithLessOrEqualZeroPrecision): void
-    {
-        $span = TimeSpan::fromNanoseconds($nanoseconds);
-
-        self::assertSame($expectedWithPositivePrecision, $span->toMilliseconds(1));
-        self::assertSame($expectedWithLessOrEqualZeroPrecision, $span->toMilliseconds());
     }
 
     #[TestWith([100_000, 100.0, 100])]
