@@ -20,6 +20,17 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expectedDiffUs, $diff->toMicroseconds());
     }
 
+    #[TestWith(['@123.00333', '@124.00555', 1_002_220])]
+    #[TestWith(['@124.00555', '@123.00333', 1_002_220])]
+    #[TestWith(['2021-10-30 09:00:00 Europe/London', '2021-10-31 08:30:00 Europe/London', 88_200_000_000])]
+    #[TestWith(['2021-10-30 09:00:00 Europe/London', '2021-10-31 09:00:00 Europe/London', 90_000_000_000])]
+    public function testDiffAbsolute(string $a, string $b, int $expectedDiffUs): void
+    {
+        $diff = TimeSpan::diff(new \DateTimeImmutable($a), new \DateTimeImmutable($b), absolute: true);
+
+        self::assertSame($expectedDiffUs, $diff->toMicroseconds());
+    }
+
     /**
      * @param array{days?: float|int, hours?: float|int, minutes?: float|int, seconds?: float|int, milliseconds?: float|int, microseconds?: float|int} $args
      */

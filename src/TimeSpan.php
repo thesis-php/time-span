@@ -17,9 +17,15 @@ final readonly class TimeSpan
     private const int MULT_HOURS = self::MULT_MINUTES * 60;
     private const int MULT_DAYS = self::MULT_HOURS * 24;
 
-    public static function diff(\DateTimeImmutable $a, \DateTimeImmutable $b): self
+    public static function diff(\DateTimeImmutable $a, \DateTimeImmutable $b, bool $absolute = false): self
     {
-        return new self((int) $a->format('Uu') * 1000 - (int) $b->format('Uu') * 1000);
+        $microseconds = (int) $a->format('Uu') - (int) $b->format('Uu');
+
+        if ($absolute) {
+            return self::fromMicroseconds(abs($microseconds));
+        }
+
+        return self::fromMicroseconds($microseconds);
     }
 
     public static function from(
