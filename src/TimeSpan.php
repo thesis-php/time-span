@@ -214,4 +214,72 @@ final readonly class TimeSpan
 
         return $value;
     }
+
+    public function abs(): self
+    {
+        return new self(abs($this->nanoseconds));
+    }
+
+    public function negated(): self
+    {
+        return new self(-$this->nanoseconds);
+    }
+
+    /**
+     * @return int<-1, 1>
+     */
+    public function compareTo(self $another): int
+    {
+        return $this->nanoseconds <=> $another->nanoseconds;
+    }
+
+    public function isEqualTo(self $another): bool
+    {
+        return $this->nanoseconds === $another->nanoseconds;
+    }
+
+    public function isLessThan(self $another): bool
+    {
+        return $this->nanoseconds < $another->nanoseconds;
+    }
+
+    public function isLessThanOrEqualTo(self $another): bool
+    {
+        return $this->nanoseconds <= $another->nanoseconds;
+    }
+
+    public function isGreaterThan(self $another): bool
+    {
+        return $this->nanoseconds > $another->nanoseconds;
+    }
+
+    public function isGreaterThanOrEqualTo(self $another): bool
+    {
+        return $this->nanoseconds >= $another->nanoseconds;
+    }
+
+    public function isZero(): bool
+    {
+        return $this->nanoseconds === 0;
+    }
+
+    public function isNegative(): bool
+    {
+        return $this->nanoseconds < 0;
+    }
+
+    public function isNegativeOrZero(): bool
+    {
+        return $this->nanoseconds <= 0;
+    }
+
+    public function isPositive(): bool
+    {
+        return $this->nanoseconds > 0;
+    }
+
+    public function isPositiveOrZero(): bool
+    {
+        return $this->nanoseconds >= 0;
+    }
 }
