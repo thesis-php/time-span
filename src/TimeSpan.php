@@ -89,6 +89,42 @@ final readonly class TimeSpan
         return (int) round($value * $multiplier);
     }
 
+    public static function fromInterval(\DateInterval $interval): self
+    {
+        if ($interval->m !== 0 || $interval->y !== 0) {
+            throw new \InvalidArgumentException(
+                \sprintf(
+                    'Month and year cannot be converted to nanoseconds correctly. Use `%s::diff()` instead.',
+                    self::class,
+                ),
+            );
+        }
+
+        if ($interval->days !== false) {
+            throw new \InvalidArgumentException(
+                \sprintf(
+                    'Given interval was obtained from `%s::diff()` and cannot be interpreted correctly due to DST changeovers. Use `%s::diff()` instead.',
+                    \DateTimeInterface::class,
+                    self::class,
+                ),
+            );
+        }
+
+        $timeSpan = self::from(
+            days: $interval->d,
+            hours: $interval->h,
+            minutes: $interval->i,
+            seconds: $interval->s,
+            microseconds: $interval->f,
+        );
+
+        if ($interval->invert === 1) {
+            return new self(-$timeSpan->nanoseconds);
+        }
+
+        return $timeSpan;
+    }
+
     private function __construct(
         private int $nanoseconds,
     ) {}

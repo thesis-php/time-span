@@ -13,6 +13,8 @@ final class TimeSpanTest extends TestCase
 {
     #[TestWith(['@123.00333', '@124.00555', -1_002_220])]
     #[TestWith(['@124.00555', '@123.00333', 1_002_220])]
+    #[TestWith(['2021-10-31 08:30:00 Europe/London', '2021-10-30 09:00:00 Europe/London', 88_200_000_000])]
+    #[TestWith(['2021-10-31 09:00:00 Europe/London', '2021-10-30 09:00:00 Europe/London', 90_000_000_000])]
     public function testDiff(string $a, string $b, int $expectedDiffUs): void
     {
         $diff = TimeSpan::diff(new \DateTimeImmutable($a), new \DateTimeImmutable($b));
@@ -24,46 +26,105 @@ final class TimeSpanTest extends TestCase
      * @param array{days?: float|int, hours?: float|int, minutes?: float|int, seconds?: float|int, milliseconds?: float|int, microseconds?: float|int} $args
      */
     #[TestWith([
-        ['seconds' => 987, 'milliseconds' => 654, 'microseconds' => 321],
-        987_654_321,
+        ['seconds' => 987, 'milliseconds' => 654, 'microseconds' => 321, 'nanoseconds' => 123],
+        987_654_321_123,
     ])]
     #[TestWith([
-        ['milliseconds' => -1.555, 'microseconds' => -445],
-        -2000,
+        ['milliseconds' => -1.555, 'microseconds' => -445, 'nanoseconds' => -123],
+        -2_000_123,
     ])]
     #[TestWith([
-        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'microseconds' => 333],
-        650_975_222_333,
-    ])]
-    #[TestWith([
-        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222],
-        650_975_222_000,
+        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'microseconds' => 333, 'nanoseconds' => 123],
+        650_975_222_333_123,
     ])]
     #[TestWith([
         ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'nanoseconds' => 10000],
-        650_975_222_010,
+        650_975_222_010_000,
+    ])]
+    #[TestWith([
+        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222],
+        650_975_222_000_000,
     ])]
     #[TestWith([
         ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35],
-        650_975_000_000,
+        650_975_000_000_000,
     ])]
     #[TestWith([
         ['days' => 7, 'hours' => 12, 'minutes' => 49],
-        650_940_000_000,
+        650_940_000_000_000,
     ])]
     #[TestWith([
         ['days' => 7, 'hours' => 12],
-        648_000_000_000,
+        648_000_000_000_000,
     ])]
     #[TestWith([
         ['days' => 7],
-        604_800_000_000,
+        604_800_000_000_000,
     ])]
     public function testFrom(array $args, int $expected): void
     {
         $timeSpan = TimeSpan::from(...$args);
 
+        self::assertSame($expected, $timeSpan->toNanoseconds());
+    }
+
+    #[TestWith(['P1W2D', 777_600_000_000])]
+    #[TestWith(['P7D', 604_800_000_000])]
+    #[TestWith(['PT2S', 2_000_000])]
+    public function testFromInterval(string $interval, int $expected): void
+    {
+        $timeSpan = TimeSpan::fromInterval(new \DateInterval($interval));
+
         self::assertSame($expected, $timeSpan->toMicroseconds());
+    }
+
+    #[TestWith(['P1W2D', -777_600_000_000])]
+    #[TestWith(['P7D', -604_800_000_000])]
+    #[TestWith(['PT2S', -2_000_000])]
+    public function testFromIntervalInvert(string $interval, int $expected): void
+    {
+        $dateInterval = new \DateInterval($interval);
+        $dateInterval->invert = 1;
+
+        $timeSpan = TimeSpan::fromInterval($dateInterval);
+
+        self::assertSame($expected, $timeSpan->toMicroseconds());
+    }
+
+    #[TestWith(['P1Y2M'])]
+    #[TestWith(['P1Y'])]
+    #[TestWith(['P2M'])]
+    public function testItThrowsForInvalidInterval(string $interval): void
+    {
+        $this->expectExceptionObject(
+            new \InvalidArgumentException(
+                \sprintf(
+                    'Month and year cannot be converted to nanoseconds correctly. Use `%s::diff()` instead.',
+                    TimeSpan::class,
+                ),
+            ),
+        );
+
+        TimeSpan::fromInterval(new \DateInterval($interval));
+    }
+
+    public function testItThrowsForDateTimeInterfaceDiffInterval(): void
+    {
+        $originalTime = new \DateTimeImmutable('2021-10-30 09:00:00 Europe/London');
+        $targetTime = new \DateTimeImmutable('2021-10-31 09:00:00 Europe/London');
+        $interval = $originalTime->diff($targetTime);
+
+        $this->expectExceptionObject(
+            new \InvalidArgumentException(
+                \sprintf(
+                    'Given interval was obtained from `%s::diff()` and cannot be interpreted correctly due to DST changeovers. Use `%s::diff()` instead.',
+                    \DateTimeInterface::class,
+                    TimeSpan::class,
+                ),
+            ),
+        );
+
+        TimeSpan::fromInterval($interval);
     }
 
     #[TestWith([100, 100])]
@@ -141,18 +202,6 @@ final class TimeSpanTest extends TestCase
         $span = TimeSpan::fromDays($days);
 
         self::assertSame($expected, $span->toMicroseconds());
-    }
-
-    #[TestWith([100_000_000, 100.0, 100])]
-    #[TestWith([100_100_000, 100.1, 100])]
-    #[TestWith([100_500_000, 100.5, 101])]
-    #[TestWith([100_999_000, 101.0, 101])]
-    public function testToMicroseconds(int $nanoseconds, float $expectedWithPositivePrecision, int $expectedWithLessOrEqualZeroPrecision): void
-    {
-        $span = TimeSpan::fromNanoseconds($nanoseconds);
-
-        self::assertSame($expectedWithPositivePrecision, $span->toMilliseconds(1));
-        self::assertSame($expectedWithLessOrEqualZeroPrecision, $span->toMilliseconds());
     }
 
     #[TestWith([100_000, 100.0, 100])]
