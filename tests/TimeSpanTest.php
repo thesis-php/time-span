@@ -267,31 +267,37 @@ final class TimeSpanTest extends TestCase
     #[TestWith([8_640_000_000_000, 8_640_000_000_000])]
     #[TestWith([-8_640_000_000_000, 8_640_000_000_000])]
     #[TestWith([0, 0])]
-    public function testAbs(int $microseconds, int $expectedMicroseconds): void
+    public function testAbs(int $microseconds, int $expectedAbs): void
     {
         $span = TimeSpan::fromMicroseconds($microseconds);
 
-        self::assertSame($expectedMicroseconds, $span->abs()->toMicroseconds());
+        $abs = $span->abs()->toMicroseconds();
+
+        self::assertSame($expectedAbs, $abs);
     }
 
     #[TestWith([8_640_000_000_000, -8_640_000_000_000])]
     #[TestWith([-8_640_000_000_000, 8_640_000_000_000])]
-    public function testNegated(int $microseconds, int $expectedMicroseconds): void
+    public function testNegated(int $microseconds, int $expectedNegated): void
     {
         $span = TimeSpan::fromMicroseconds($microseconds);
 
-        self::assertSame($expectedMicroseconds, $span->negated()->toMicroseconds());
+        $negated = $span->negated()->toMicroseconds();
+
+        self::assertSame($expectedNegated, $negated);
     }
 
     #[TestWith([8_640_000_000_000, 8_640_000_000_000, 0])]
     #[TestWith([8_640_000_000_000, 360_000_000_000, 1])]
     #[TestWith([360_000_000_000, 8_640_000_000_000, -1])]
-    public function testCompareTo(int $firstMicroseconds, int $secondMicroseconds, int $expectedCompare): void
+    public function testCompareTo(int $firstMicroseconds, int $secondMicroseconds, int $expectedComparison): void
     {
         $first = TimeSpan::fromMicroseconds($firstMicroseconds);
         $second = TimeSpan::fromMicroseconds($secondMicroseconds);
 
-        self::assertSame($expectedCompare, $first->compareTo($second));
+        $comparison = $first->compareTo($second);
+
+        self::assertSame($expectedComparison, $comparison);
     }
 
     #[TestWith([8_640_000_000_000, 8_640_000_000_000, true])]
@@ -302,7 +308,9 @@ final class TimeSpanTest extends TestCase
         $first = TimeSpan::fromMicroseconds($firstMicroseconds);
         $second = TimeSpan::fromMicroseconds($secondMicroseconds);
 
-        self::assertSame($expected, $first->isEqualTo($second));
+        $equals = $first->isEqualTo($second);
+
+        self::assertSame($expected, $equals);
     }
 
     #[TestWith([8_640_000_000_000, 8_640_000_000_000, false])]
@@ -313,7 +321,9 @@ final class TimeSpanTest extends TestCase
         $first = TimeSpan::fromMicroseconds($firstMicroseconds);
         $second = TimeSpan::fromMicroseconds($secondMicroseconds);
 
-        self::assertSame($expected, $first->isLessThan($second));
+        $actual = $first->isLessThan($second);
+
+        self::assertSame($expected, $actual);
     }
 
     #[TestWith([8_640_000_000_000, 8_640_000_000_000, true])]
@@ -324,18 +334,21 @@ final class TimeSpanTest extends TestCase
         $first = TimeSpan::fromMicroseconds($firstMicroseconds);
         $second = TimeSpan::fromMicroseconds($secondMicroseconds);
 
-        self::assertSame($expected, $first->isLessThanOrEqualTo($second));
+        $actual = $first->isLessThanOrEqualTo($second);
+
+        self::assertSame($expected, $actual);
     }
 
-    #[TestWith([8_640_000_000_000, 8_640_000_000_000, false])]
-    #[TestWith([8_640_000_000_000, 360_000_000_000, true])]
-    #[TestWith([360_000_000_000, 8_640_000_000_000, false])]
-    public function testGreaterThan(int $firstMicroseconds, int $secondMicroseconds, bool $expected): void
+    #[TestWith([-8_640_000_000_000, false])]
+    #[TestWith([8_640_000_000_000, false])]
+    #[TestWith([0, true])]
+    public function testIsZero(int $microseconds, bool $expected): void
     {
-        $first = TimeSpan::fromMicroseconds($firstMicroseconds);
-        $second = TimeSpan::fromMicroseconds($secondMicroseconds);
+        $span = TimeSpan::fromMicroseconds($microseconds);
 
-        self::assertSame($expected, $first->isGreaterThan($second));
+        $actual = $span->isZero();
+
+        self::assertSame($expected, $actual);
     }
 
     #[TestWith([8_640_000_000_000, 8_640_000_000_000, true])]
@@ -346,17 +359,22 @@ final class TimeSpanTest extends TestCase
         $first = TimeSpan::fromMicroseconds($firstMicroseconds);
         $second = TimeSpan::fromMicroseconds($secondMicroseconds);
 
-        self::assertSame($expected, $first->isGreaterThanOrEqualTo($second));
+        $actual = $first->isGreaterThanOrEqualTo($second);
+
+        self::assertSame($expected, $actual);
     }
 
-    #[TestWith([-8_640_000_000_000, false])]
-    #[TestWith([8_640_000_000_000, false])]
-    #[TestWith([0, true])]
-    public function testIsZero(int $microseconds, bool $expected): void
+    #[TestWith([8_640_000_000_000, 8_640_000_000_000, false])]
+    #[TestWith([8_640_000_000_000, 360_000_000_000, true])]
+    #[TestWith([360_000_000_000, 8_640_000_000_000, false])]
+    public function testGreaterThan(int $firstMicroseconds, int $secondMicroseconds, bool $expected): void
     {
-        $span = TimeSpan::fromMicroseconds($microseconds);
+        $first = TimeSpan::fromMicroseconds($firstMicroseconds);
+        $second = TimeSpan::fromMicroseconds($secondMicroseconds);
 
-        self::assertSame($expected, $span->isZero());
+        $actual = $first->isGreaterThan($second);
+
+        self::assertSame($expected, $actual);
     }
 
     #[TestWith([-8_640_000_000_000, true])]
@@ -366,7 +384,9 @@ final class TimeSpanTest extends TestCase
     {
         $span = TimeSpan::fromMicroseconds($microseconds);
 
-        self::assertSame($expected, $span->isNegative());
+        $actual = $span->isNegative();
+
+        self::assertSame($expected, $actual);
     }
 
     #[TestWith([-8_640_000_000_000, true])]
@@ -376,7 +396,9 @@ final class TimeSpanTest extends TestCase
     {
         $span = TimeSpan::fromMicroseconds($microseconds);
 
-        self::assertSame($expected, $span->isNegativeOrZero());
+        $actual = $span->isNegativeOrZero();
+
+        self::assertSame($expected, $actual);
     }
 
     #[TestWith([-8_640_000_000_000, false])]
@@ -386,7 +408,9 @@ final class TimeSpanTest extends TestCase
     {
         $span = TimeSpan::fromMicroseconds($microseconds);
 
-        self::assertSame($expected, $span->isPositive());
+        $actual = $span->isPositive();
+
+        self::assertSame($expected, $actual);
     }
 
     #[TestWith([-8_640_000_000_000, false])]
@@ -396,6 +420,8 @@ final class TimeSpanTest extends TestCase
     {
         $span = TimeSpan::fromMicroseconds($microseconds);
 
-        self::assertSame($expected, $span->isPositiveOrZero());
+        $actual = $span->isPositiveOrZero();
+
+        self::assertSame($expected, $actual);
     }
 }

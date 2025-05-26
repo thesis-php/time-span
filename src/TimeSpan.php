@@ -248,9 +248,9 @@ final readonly class TimeSpan
         return $this->nanoseconds <= $another->nanoseconds;
     }
 
-    public function isGreaterThan(self $another): bool
+    public function isZero(): bool
     {
-        return $this->nanoseconds > $another->nanoseconds;
+        return $this->nanoseconds === 0;
     }
 
     public function isGreaterThanOrEqualTo(self $another): bool
@@ -258,9 +258,9 @@ final readonly class TimeSpan
         return $this->nanoseconds >= $another->nanoseconds;
     }
 
-    public function isZero(): bool
+    public function isGreaterThan(self $another): bool
     {
-        return $this->nanoseconds === 0;
+        return $this->nanoseconds > $another->nanoseconds;
     }
 
     public function isNegative(): bool
