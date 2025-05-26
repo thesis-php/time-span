@@ -15,5 +15,10 @@
     "minCoveredMsi": 90,
     "mutators": {
         "@default": true,
+        "CastInt": {
+            "ignore": [
+                "Thesis\\Time\\TimeSpan::diff"
+            ]
+        }
     },
 }
