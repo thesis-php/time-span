@@ -263,4 +263,165 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expectedWithPositivePrecision, $span->toDays(1));
         self::assertSame($expectedWithLessOrEqualZeroPrecision, $span->toDays());
     }
+
+    #[TestWith([8_640_000_000_000, 8_640_000_000_000])]
+    #[TestWith([-8_640_000_000_000, 8_640_000_000_000])]
+    #[TestWith([0, 0])]
+    public function testAbs(int $microseconds, int $expectedAbs): void
+    {
+        $span = TimeSpan::fromMicroseconds($microseconds);
+
+        $abs = $span->abs()->toMicroseconds();
+
+        self::assertSame($expectedAbs, $abs);
+    }
+
+    #[TestWith([8_640_000_000_000, -8_640_000_000_000])]
+    #[TestWith([-8_640_000_000_000, 8_640_000_000_000])]
+    public function testNegated(int $microseconds, int $expectedNegated): void
+    {
+        $span = TimeSpan::fromMicroseconds($microseconds);
+
+        $negated = $span->negated()->toMicroseconds();
+
+        self::assertSame($expectedNegated, $negated);
+    }
+
+    #[TestWith([8_640_000_000_000, 8_640_000_000_000, 0])]
+    #[TestWith([8_640_000_000_000, 360_000_000_000, 1])]
+    #[TestWith([360_000_000_000, 8_640_000_000_000, -1])]
+    public function testCompareTo(int $firstMicroseconds, int $secondMicroseconds, int $expectedComparison): void
+    {
+        $first = TimeSpan::fromMicroseconds($firstMicroseconds);
+        $second = TimeSpan::fromMicroseconds($secondMicroseconds);
+
+        $comparison = $first->compareTo($second);
+
+        self::assertSame($expectedComparison, $comparison);
+    }
+
+    #[TestWith([8_640_000_000_000, 8_640_000_000_000, true])]
+    #[TestWith([8_640_000_000_000, 360_000_000_000, false])]
+    #[TestWith([360_000_000_000, 8_640_000_000_000, false])]
+    public function testIsEqualTo(int $firstMicroseconds, int $secondMicroseconds, bool $expected): void
+    {
+        $first = TimeSpan::fromMicroseconds($firstMicroseconds);
+        $second = TimeSpan::fromMicroseconds($secondMicroseconds);
+
+        $equals = $first->isEqualTo($second);
+
+        self::assertSame($expected, $equals);
+    }
+
+    #[TestWith([8_640_000_000_000, 8_640_000_000_000, false])]
+    #[TestWith([8_640_000_000_000, 360_000_000_000, false])]
+    #[TestWith([360_000_000_000, 8_640_000_000_000, true])]
+    public function testLessThan(int $firstMicroseconds, int $secondMicroseconds, bool $expected): void
+    {
+        $first = TimeSpan::fromMicroseconds($firstMicroseconds);
+        $second = TimeSpan::fromMicroseconds($secondMicroseconds);
+
+        $actual = $first->isLessThan($second);
+
+        self::assertSame($expected, $actual);
+    }
+
+    #[TestWith([8_640_000_000_000, 8_640_000_000_000, true])]
+    #[TestWith([8_640_000_000_000, 360_000_000_000, false])]
+    #[TestWith([360_000_000_000, 8_640_000_000_000, true])]
+    public function testIsLessThanOrEqualTo(int $firstMicroseconds, int $secondMicroseconds, bool $expected): void
+    {
+        $first = TimeSpan::fromMicroseconds($firstMicroseconds);
+        $second = TimeSpan::fromMicroseconds($secondMicroseconds);
+
+        $actual = $first->isLessThanOrEqualTo($second);
+
+        self::assertSame($expected, $actual);
+    }
+
+    #[TestWith([-8_640_000_000_000, false])]
+    #[TestWith([8_640_000_000_000, false])]
+    #[TestWith([0, true])]
+    public function testIsZero(int $microseconds, bool $expected): void
+    {
+        $span = TimeSpan::fromMicroseconds($microseconds);
+
+        $actual = $span->isZero();
+
+        self::assertSame($expected, $actual);
+    }
+
+    #[TestWith([8_640_000_000_000, 8_640_000_000_000, true])]
+    #[TestWith([8_640_000_000_000, 360_000_000_000, true])]
+    #[TestWith([360_000_000_000, 8_640_000_000_000, false])]
+    public function testIsGreaterThanOrEqualTo(int $firstMicroseconds, int $secondMicroseconds, bool $expected): void
+    {
+        $first = TimeSpan::fromMicroseconds($firstMicroseconds);
+        $second = TimeSpan::fromMicroseconds($secondMicroseconds);
+
+        $actual = $first->isGreaterThanOrEqualTo($second);
+
+        self::assertSame($expected, $actual);
+    }
+
+    #[TestWith([8_640_000_000_000, 8_640_000_000_000, false])]
+    #[TestWith([8_640_000_000_000, 360_000_000_000, true])]
+    #[TestWith([360_000_000_000, 8_640_000_000_000, false])]
+    public function testGreaterThan(int $firstMicroseconds, int $secondMicroseconds, bool $expected): void
+    {
+        $first = TimeSpan::fromMicroseconds($firstMicroseconds);
+        $second = TimeSpan::fromMicroseconds($secondMicroseconds);
+
+        $actual = $first->isGreaterThan($second);
+
+        self::assertSame($expected, $actual);
+    }
+
+    #[TestWith([-8_640_000_000_000, true])]
+    #[TestWith([8_640_000_000_000, false])]
+    #[TestWith([0, false])]
+    public function testIsNegative(int $microseconds, bool $expected): void
+    {
+        $span = TimeSpan::fromMicroseconds($microseconds);
+
+        $actual = $span->isNegative();
+
+        self::assertSame($expected, $actual);
+    }
+
+    #[TestWith([-8_640_000_000_000, true])]
+    #[TestWith([8_640_000_000_000, false])]
+    #[TestWith([0, true])]
+    public function testIsNegativeOrZero(int $microseconds, bool $expected): void
+    {
+        $span = TimeSpan::fromMicroseconds($microseconds);
+
+        $actual = $span->isNegativeOrZero();
+
+        self::assertSame($expected, $actual);
+    }
+
+    #[TestWith([-8_640_000_000_000, false])]
+    #[TestWith([8_640_000_000_000, true])]
+    #[TestWith([0, false])]
+    public function testIsPositive(int $microseconds, bool $expected): void
+    {
+        $span = TimeSpan::fromMicroseconds($microseconds);
+
+        $actual = $span->isPositive();
+
+        self::assertSame($expected, $actual);
+    }
+
+    #[TestWith([-8_640_000_000_000, false])]
+    #[TestWith([8_640_000_000_000, true])]
+    #[TestWith([0, true])]
+    public function testIsPositiveOrZero(int $microseconds, bool $expected): void
+    {
+        $span = TimeSpan::fromMicroseconds($microseconds);
+
+        $actual = $span->isPositiveOrZero();
+
+        self::assertSame($expected, $actual);
+    }
 }
