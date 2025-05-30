@@ -41,9 +41,8 @@ final class TimeSpanTest extends TestCase
         $this->expectExceptionObject(
             new \InvalidArgumentException(
                 \sprintf(
-                    'Given format `%s` is not valid. Available units: `%s`',
+                    'Given format `%s` is not valid. Available units: `%%d`, `%%h`, `%%i`, `%%s`, `%%ms`, `%%us`, `%%ns`',
                     $format,
-                    implode(', ', TimeSpan::UNIT_PLACEHOLDERS),
                 ),
             ),
         );
