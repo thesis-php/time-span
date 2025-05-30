@@ -96,7 +96,10 @@ final readonly class TimeSpan
         if ($value >= 0) {
             /** @var non-empty-string */
             static $max = (string) PHP_INT_MAX;
-            /** @var non-empty-string */
+            /**
+             * @var non-empty-string
+             * @psalm-suppress UnusedFunctionCall
+             */
             static $positiveFormat = \sprintf("%%'0%s.0f", \strlen($max));
 
             $nanoseconds = \sprintf($positiveFormat, round($value * $multiplier));
@@ -110,7 +113,10 @@ final readonly class TimeSpan
 
         /** @var non-empty-string */
         static $min = (string) PHP_INT_MIN;
-        /** @var non-empty-string */
+        /**
+         * @var non-empty-string
+         * @psalm-suppress UnusedFunctionCall
+         */
         static $negativeFormat = \sprintf("%%'0%s.0f", \strlen($min));
 
         $nanoseconds = \sprintf($negativeFormat, round($value * $multiplier));
