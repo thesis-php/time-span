@@ -51,9 +51,9 @@ final class FormatsDataProvider
             yield '-' . $format => [$format, -self::NANOSECONDS, '-' . $value];
         }
 
-        yield 'trim_case %d %h:%i:%s.%ms_%us_%ns' => ['%d %h:%i:%s.%ms_%us_%ns', 82_023_056_089_023, '22:47:03.056_089_023'];
-        yield 'trim_case -%d %h:%i:%s.%ms_%us_%ns' => ['%d %h:%i:%s.%ms_%us_%ns', -82_023_056_089_023, '-22:47:03.056_089_023'];
+        yield 'trim_case %d %h:%i:%s.%ms_%us_%ns' => ['%d %h:%i:%s.%ms_%us_%ns', 82_023_056_089_023, '0 22:47:03.056_089_023'];
+        yield 'trim_case -%d %h:%i:%s.%ms_%us_%ns' => ['%d %h:%i:%s.%ms_%us_%ns', -82_023_056_089_023, '-0 22:47:03.056_089_023'];
 
-        yield 'zero_nanoseconds_case %d %h:%i:%s.%ms_%us_%ns' => ['%d %h:%i:%s.%ms_%us_%ns', 0, '00:00:00.000_000_000'];
+        yield 'zero_nanoseconds_case %d %h:%i:%s.%ms_%us_%ns' => ['%d %h:%i:%s.%ms_%us_%ns', 0, '0 00:00:00.000_000_000'];
     }
 }

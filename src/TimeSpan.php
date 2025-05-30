@@ -333,7 +333,7 @@ final readonly class TimeSpan
         foreach ($usedUnits as $unit => $placeholder) {
             $value = (int) floor($remaining / self::UNITS_MULT_MAP[$unit]);
             $formatedValue = match ($unit) {
-                'd' => $value === 0 ? '' : (string) $value,
+                'd' => (string) $value,
                 'h', 'i', 's' => str_pad((string) $value, 2, '0', STR_PAD_LEFT),
                 'ms', 'us', 'ns' => str_pad((string) $value, 3, '0', STR_PAD_LEFT),
             };
@@ -342,8 +342,10 @@ final readonly class TimeSpan
             $result = str_replace($placeholder, $formatedValue, $result);
         }
 
-        $sign = $this->nanoseconds < 0 ? '-' : '';
+        if ($this->nanoseconds < 0) {
+            return '-' . $result;
+        }
 
-        return $sign . trim($result);
+        return $result;
     }
 }
