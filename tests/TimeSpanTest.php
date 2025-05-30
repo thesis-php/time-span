@@ -6,6 +6,7 @@ namespace Thesis\Time;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
@@ -245,14 +246,33 @@ final class TimeSpanTest extends TestCase
     }
 
     #[TestWith([100, 8_640_000_000_000_000])]
-    #[TestWith([100.1, 8_648_640_000_000_000])]
-    #[TestWith([100.5, 8_683_200_000_000_000])]
-    #[TestWith([100.99_999, 8_726_399_136_000_000])]
     #[TestWith([106751, 9_223_286_400_000_000_000])]
     #[TestWith([-106751, -9_223_286_400_000_000_000])]
     #[TestWith([106751.991167300628148950636386871337890625, 9223372036854774784])]
     #[TestWith([-106751.991167300628148950636386871337890625, -9223372036854774784])]
     public function testFromDays(int|float $days, int $expected): void
+    {
+        $span = TimeSpan::fromDays($days);
+
+        self::assertSame($expected, $span->toNanoseconds());
+    }
+
+    #[RequiresPhp('<8.4')]
+    #[TestWith([100.1, 8_648_640_000_000_000])]
+    #[TestWith([100.5, 8_683_200_000_000_000])]
+    #[TestWith([100.99_999, 8_726_399_136_000_000])]
+    public function testFromDaysPHPBefore84(float $days, int $expected): void
+    {
+        $span = TimeSpan::fromDays($days);
+
+        self::assertSame($expected, $span->toNanoseconds());
+    }
+
+    #[RequiresPhp('>=8.4')]
+    #[TestWith([100.1, 8_648_640_000_000_001])]
+    #[TestWith([100.5, 8_683_200_000_000_001])]
+    #[TestWith([100.99_999, 8_726_399_136_000_001])]
+    public function testFromDaysPHPSince84(float $days, int $expected): void
     {
         $span = TimeSpan::fromDays($days);
 
