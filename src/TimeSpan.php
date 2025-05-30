@@ -287,6 +287,26 @@ final readonly class TimeSpan
     {
         return $this->nanoseconds >= 0;
     }
+
+    public function add(self $timeSpan): self
+    {
+        return self::fromNanoseconds($this->nanoseconds + $timeSpan->nanoseconds);
+    }
+
+    public function sub(self $timeSpan): self
+    {
+        return self::fromNanoseconds($this->nanoseconds - $timeSpan->nanoseconds);
+    }
+
+    public function mul(int|float $times): self
+    {
+        return self::fromNanoseconds($this->nanoseconds * $times);
+    }
+
+    public function div(int|float $factor): self
+    {
+        return self::fromNanoseconds($this->nanoseconds / $factor);
+    }
     private const array UNITS_MULT_MAP = [
         'd' => self::MULT_DAYS,
         'h' => self::MULT_HOURS,

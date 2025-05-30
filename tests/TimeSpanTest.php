@@ -529,4 +529,109 @@ final class TimeSpanTest extends TestCase
 
         self::assertSame($expected, $actual);
     }
+
+    #[TestWith([2, 2, 4])]
+    #[TestWith([250, 250, 500])]
+    #[TestWith([-250, 250, 0])]
+    #[TestWith([-250, -250, -500])]
+    public function testAdd(int $firstDays, int $secondDays, int $sumDays): void
+    {
+        $firstSpan = TimeSpan::fromDays($firstDays);
+        $secondSpan = TimeSpan::fromDays($secondDays);
+
+        $sum = $firstSpan->add($secondSpan);
+
+        self::assertEquals($sumDays, $sum->toDays());
+    }
+
+    public function testAddOverflow(): void
+    {
+        self::expectException(\OutOfBoundsException::class);
+
+        $tooManyDays = 99999;
+        $firstSpan = TimeSpan::fromDays($tooManyDays);
+        $secondSpan = TimeSpan::fromDays($tooManyDays);
+
+        $firstSpan->add($secondSpan);
+    }
+
+    #[TestWith([4, 2, 2])]
+    #[TestWith([250, 250, 0])]
+    #[TestWith([-250, 250, -500])]
+    #[TestWith([-250, -250, 0])]
+    public function testSub(int $firstDays, int $secondDays, int $diffDays): void
+    {
+        $firstSpan = TimeSpan::fromDays($firstDays);
+        $secondSpan = TimeSpan::fromDays($secondDays);
+
+        $diff = $firstSpan->sub($secondSpan);
+
+        self::assertEquals($diffDays, $diff->toDays());
+    }
+
+    public function testSubOverflow(): void
+    {
+        self::expectException(\OutOfBoundsException::class);
+
+        $tooManyDays = 99999;
+        $zeroSpan = TimeSpan::fromDays(0);
+        $subSpan = TimeSpan::fromDays($tooManyDays);
+
+        $zeroSpan->sub($subSpan)
+            ->sub($subSpan);
+    }
+
+    #[TestWith([2, 2, 4])]
+    #[TestWith([3, 3, 9])]
+    #[TestWith([5, 0, 0])]
+    #[TestWith([10, 0.5, 5])]
+    public function testMul(int $days, int|float $times, int $daysProduct): void
+    {
+        $span = TimeSpan::fromDays($days);
+
+        $product = $span->mul($times);
+
+        self::assertEquals($daysProduct, $product->toDays());
+    }
+
+    public function testMulOverflow(): void
+    {
+        self::expectException(\OutOfBoundsException::class);
+
+        $tooManyDays = 99999;
+        $span = TimeSpan::fromDays($tooManyDays);
+
+        $span->mul(2);
+    }
+
+    #[TestWith([8_640_000_000_000, 1000, 8_640_000_000])]
+    #[TestWith([1_111_111_111_111, 3, 3_703_703_703_70])]
+    #[TestWith([1_111_111_111_111, 4, 2_777_777_777_78])]
+    #[TestWith([8_640_000_00, 0.1, 8_640_000_000])]
+    public function testDiv(int $nanoseconds, int|float $factor, int $nanosecondsQuotient): void
+    {
+        $span = TimeSpan::fromNanoseconds($nanoseconds);
+
+        $quotient = $span->div($factor);
+
+        self::assertEquals($nanosecondsQuotient, $quotient->toNanoseconds());
+    }
+
+    public function testDivOverflow(): void
+    {
+        self::expectException(\OutOfBoundsException::class);
+
+        $tooManyDays = 99999;
+        $span = TimeSpan::fromDays($tooManyDays);
+
+        $span->div(0.1);
+    }
+
+    public function testDivByZero(): void
+    {
+        self::expectException(\DivisionByZeroError::class);
+
+        $span = TimeSpan::fromDays(5);
+        $span->div(0);
+    }
 }
