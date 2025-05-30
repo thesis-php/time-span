@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thesis\Time;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
@@ -20,6 +21,52 @@ final class TimeSpanTest extends TestCase
         $diff = TimeSpan::diff(new \DateTimeImmutable($a), new \DateTimeImmutable($b));
 
         self::assertSame($expectedDiffUs, $diff->toMicroseconds());
+    }
+
+    #[DataProviderExternal(FormatsDataProvider::class, 'formats')]
+    public function testFormat(string $format, int $nanoseconds, string $expected): void
+    {
+        $timeSpan = TimeSpan::fromNanoseconds($nanoseconds);
+
+        $timeSpanFormated = $timeSpan->format($format);
+
+        self::assertSame($expected, $timeSpanFormated);
+    }
+
+    public function testItThrowsForInvalidFormatWithOutPlaceholders(): void
+    {
+        $format = 'some text without placeholders';
+        $timeSpan = TimeSpan::fromNanoseconds(123);
+
+        $this->expectExceptionObject(
+            new \InvalidArgumentException(
+                \sprintf(
+                    'Given format `%s` is not valid. Available units: `%%d`, `%%h`, `%%i`, `%%s`, `%%ms`, `%%us`, `%%ns`',
+                    $format,
+                ),
+            ),
+        );
+
+        $timeSpan->format($format);
+    }
+
+    public function testItThrowsForInvalidFormatWithRepeatingPlaceholder(): void
+    {
+        $format = '%d %h:%i:%s.%ms_%us_%ns | %h:%i:%s.%ns';
+        $repeatingPlaceholder = '%h';
+        $timeSpan = TimeSpan::fromNanoseconds(123);
+
+        $this->expectExceptionObject(
+            new \InvalidArgumentException(
+                \sprintf(
+                    'Given format `%s` contains more than one `%s` placeholder',
+                    $format,
+                    $repeatingPlaceholder,
+                ),
+            ),
+        );
+
+        $timeSpan->format($format);
     }
 
     /**

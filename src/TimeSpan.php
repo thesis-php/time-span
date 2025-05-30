@@ -282,4 +282,70 @@ final readonly class TimeSpan
     {
         return $this->nanoseconds >= 0;
     }
+    private const array UNITS_MULT_MAP = [
+        'd' => self::MULT_DAYS,
+        'h' => self::MULT_HOURS,
+        'i' => self::MULT_MINUTES,
+        's' => self::MULT_SECONDS,
+        'ms' => self::MULT_MILLISECONDS,
+        'us' => self::MULT_MICROSECONDS,
+        'ns' => self::MULT_NANOSECONDS,
+    ];
+    private const array UNIT_PLACEHOLDERS = [
+        'd' => '%d',
+        'h' => '%h',
+        'i' => '%i',
+        's' => '%s',
+        'ms' => '%ms',
+        'us' => '%us',
+        'ns' => '%ns',
+    ];
+
+    public function format(string $format = '%h:%i:%s'): string
+    {
+        $usedUnits = array_filter(self::UNIT_PLACEHOLDERS, static fn(string $unit): bool => str_contains($format, $unit));
+
+        if ($usedUnits === []) {
+            throw new \InvalidArgumentException(
+                \sprintf(
+                    'Given format `%s` is not valid. Available units: %s',
+                    $format,
+                    implode(', ', array_map(static fn(string $unit): string => "`{$unit}`", self::UNIT_PLACEHOLDERS)),
+                ),
+            );
+        }
+
+        foreach ($usedUnits as $placeholder) {
+            if (substr_count($format, $placeholder) > 1) {
+                throw new \InvalidArgumentException(
+                    \sprintf(
+                        'Given format `%s` contains more than one `%s` placeholder',
+                        $format,
+                        $placeholder,
+                    ),
+                );
+            }
+        }
+
+        $remaining = abs($this->nanoseconds);
+        $result = $format;
+
+        foreach ($usedUnits as $unit => $placeholder) {
+            $value = (int) floor($remaining / self::UNITS_MULT_MAP[$unit]);
+            $formatedValue = match ($unit) {
+                'd' => (string) $value,
+                'h', 'i', 's' => str_pad((string) $value, 2, '0', STR_PAD_LEFT),
+                'ms', 'us', 'ns' => str_pad((string) $value, 3, '0', STR_PAD_LEFT),
+            };
+            $remaining %= self::UNITS_MULT_MAP[$unit];
+
+            $result = str_replace($placeholder, $formatedValue, $result);
+        }
+
+        if ($this->nanoseconds < 0) {
+            return '-' . $result;
+        }
+
+        return $result;
+    }
 }
