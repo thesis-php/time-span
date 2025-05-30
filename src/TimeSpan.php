@@ -44,49 +44,82 @@ final readonly class TimeSpan
 
     public static function fromNanoseconds(int|float $nanoseconds): self
     {
-        return new self(self::fromX($nanoseconds, self::MULT_NANOSECONDS));
+        return self::fromX($nanoseconds, self::MULT_NANOSECONDS);
     }
 
     public static function fromMicroseconds(int|float $microseconds): self
     {
-        return new self(self::fromX($microseconds, self::MULT_MICROSECONDS));
+        return self::fromX($microseconds, self::MULT_MICROSECONDS);
     }
 
     public static function fromMilliseconds(int|float $milliseconds): self
     {
-        return new self(self::fromX($milliseconds, self::MULT_MILLISECONDS));
+        return self::fromX($milliseconds, self::MULT_MILLISECONDS);
     }
 
     public static function fromSeconds(int|float $seconds): self
     {
-        return new self(self::fromX($seconds, self::MULT_SECONDS));
+        return self::fromX($seconds, self::MULT_SECONDS);
     }
 
     public static function fromMinutes(int|float $minutes): self
     {
-        return new self(self::fromX($minutes, self::MULT_MINUTES));
+        return self::fromX($minutes, self::MULT_MINUTES);
     }
 
     public static function fromHours(int|float $hours): self
     {
-        return new self(self::fromX($hours, self::MULT_HOURS));
+        return self::fromX($hours, self::MULT_HOURS);
     }
 
     public static function fromDays(int|float $days): self
     {
-        return new self(self::fromX($days, self::MULT_DAYS));
+        return self::fromX($days, self::MULT_DAYS);
     }
 
     /**
      * @param self::MULT_* $multiplier
      */
-    private static function fromX(int|float $value, int $multiplier): int
+    private static function fromX(int|float $value, int $multiplier): self
     {
         if (\is_int($value)) {
-            return $value * $multiplier;
+            $nanoseconds = $value * $multiplier;
+
+            /** @phpstan-ignore function.impossibleType */
+            if (\is_float($nanoseconds)) {
+                throw new \OutOfBoundsException('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
+            }
+
+            return new self($nanoseconds);
         }
 
-        return (int) round($value * $multiplier);
+        if ($value >= 0) {
+            /** @var non-empty-string */
+            static $max = (string) PHP_INT_MAX;
+            /** @var non-empty-string */
+            static $positiveFormat = \sprintf("%%'0%s.0f", \strlen($max));
+
+            $nanoseconds = \sprintf($positiveFormat, round($value * $multiplier));
+
+            if (\strlen($nanoseconds) > \strlen($max) || strcmp($nanoseconds, $max) > 0) {
+                throw new \OutOfBoundsException('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
+            }
+
+            return new self((int) $nanoseconds);
+        }
+
+        /** @var non-empty-string */
+        static $min = (string) PHP_INT_MIN;
+        /** @var non-empty-string */
+        static $negativeFormat = \sprintf("%%'0%s.0f", \strlen($min));
+
+        $nanoseconds = \sprintf($negativeFormat, round($value * $multiplier));
+
+        if (\strlen($nanoseconds) > \strlen($min) || strcmp($nanoseconds, $min) > 0) {
+            throw new \OutOfBoundsException('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
+        }
+
+        return new self((int) $nanoseconds);
     }
 
     public static function fromInterval(\DateInterval $interval): self

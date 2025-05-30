@@ -178,6 +178,10 @@ final class TimeSpanTest extends TestCase
     #[TestWith([100.1, 100])]
     #[TestWith([100.5, 101])]
     #[TestWith([100.99_999, 101])]
+    #[TestWith([PHP_INT_MAX, PHP_INT_MAX])]
+    #[TestWith([PHP_INT_MIN, PHP_INT_MIN])]
+    #[TestWith([9223372036854775000.0, 9223372036854774784])]
+    #[TestWith([-9223372036854775000.0, -9223372036854774784])]
     public function testFromNanoseconds(int|float $nanoseconds, int $expected): void
     {
         $span = TimeSpan::fromNanoseconds($nanoseconds);
@@ -240,15 +244,31 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expected, $span->toMicroseconds());
     }
 
-    #[TestWith([100, 8_640_000_000_000])]
-    #[TestWith([100.1, 8_648_640_000_000])]
-    #[TestWith([100.5, 8_683_200_000_000])]
-    #[TestWith([100.99_999, 8_726_399_136_000])]
+    #[TestWith([100, 8_640_000_000_000_000])]
+    #[TestWith([100.1, 8_648_640_000_000_000])]
+    #[TestWith([100.5, 8_683_200_000_000_000])]
+    #[TestWith([100.99_999, 8_726_399_136_000_000])]
+    #[TestWith([106751, 9_223_286_400_000_000_000])]
+    #[TestWith([-106751, -9_223_286_400_000_000_000])]
+    #[TestWith([106751.991167300628148950636386871337890625, 9223372036854774784])]
+    #[TestWith([-106751.991167300628148950636386871337890625, -9223372036854774784])]
     public function testFromDays(int|float $days, int $expected): void
     {
         $span = TimeSpan::fromDays($days);
 
-        self::assertSame($expected, $span->toMicroseconds());
+        self::assertSame($expected, $span->toNanoseconds());
+    }
+
+    #[TestWith([106752])]
+    #[TestWith([106751.9912])]
+    #[TestWith([-106752])]
+    #[TestWith([-106751.9912])]
+    public function testFromDaysThrowsOutOfBounds(int|float $days): void
+    {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
+
+        TimeSpan::fromDays($days);
     }
 
     #[TestWith([100_000, 100.0, 100])]
