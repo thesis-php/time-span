@@ -44,59 +44,14 @@ final readonly class TimeSpan
 
     public static function fromNanoseconds(int|float $nanoseconds): self
     {
-        return self::fromX($nanoseconds, self::MULT_NANOSECONDS);
-    }
-
-    public static function fromMicroseconds(int|float $microseconds): self
-    {
-        return self::fromX($microseconds, self::MULT_MICROSECONDS);
-    }
-
-    public static function fromMilliseconds(int|float $milliseconds): self
-    {
-        return self::fromX($milliseconds, self::MULT_MILLISECONDS);
-    }
-
-    public static function fromSeconds(int|float $seconds): self
-    {
-        return self::fromX($seconds, self::MULT_SECONDS);
-    }
-
-    public static function fromMinutes(int|float $minutes): self
-    {
-        return self::fromX($minutes, self::MULT_MINUTES);
-    }
-
-    public static function fromHours(int|float $hours): self
-    {
-        return self::fromX($hours, self::MULT_HOURS);
-    }
-
-    public static function fromDays(int|float $days): self
-    {
-        return self::fromX($days, self::MULT_DAYS);
-    }
-
-    /**
-     * @param self::MULT_* $multiplier
-     */
-    private static function fromX(int|float $value, int $multiplier): self
-    {
-        if (\is_int($value)) {
-            $nanoseconds = $value * $multiplier;
-
-            /** @phpstan-ignore function.impossibleType */
-            if (\is_float($nanoseconds)) {
-                throw new \OutOfBoundsException('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
-            }
-
+        if (\is_int($nanoseconds)) {
             return new self($nanoseconds);
         }
 
-        $nanoseconds = \sprintf('%.0f', round($value * $multiplier));
+        $nanoseconds = \sprintf('%.0f', round($nanoseconds));
 
-        if ($value > 0 && self::compareUnsignedNumericStrings($nanoseconds, (string) PHP_INT_MAX) > 0
-            || $value < 0 && self::compareUnsignedNumericStrings($nanoseconds, (string) PHP_INT_MIN) > 0
+        if ($nanoseconds > 0 && self::compareUnsignedNumericStrings($nanoseconds, (string) PHP_INT_MAX) > 0
+            || $nanoseconds < 0 && self::compareUnsignedNumericStrings($nanoseconds, (string) PHP_INT_MIN) > 0
         ) {
             throw new \OutOfBoundsException('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
         }
@@ -107,6 +62,36 @@ final readonly class TimeSpan
     private static function compareUnsignedNumericStrings(string $a, string $b): int
     {
         return \strlen($a) <=> \strlen($b) ?: strcmp($a, $b);
+    }
+
+    public static function fromMicroseconds(int|float $microseconds): self
+    {
+        return self::fromNanoseconds($microseconds * self::MULT_MICROSECONDS);
+    }
+
+    public static function fromMilliseconds(int|float $milliseconds): self
+    {
+        return self::fromNanoseconds($milliseconds * self::MULT_MILLISECONDS);
+    }
+
+    public static function fromSeconds(int|float $seconds): self
+    {
+        return self::fromNanoseconds($seconds * self::MULT_SECONDS);
+    }
+
+    public static function fromMinutes(int|float $minutes): self
+    {
+        return self::fromNanoseconds($minutes * self::MULT_MINUTES);
+    }
+
+    public static function fromHours(int|float $hours): self
+    {
+        return self::fromNanoseconds($hours * self::MULT_HOURS);
+    }
+
+    public static function fromDays(int|float $days): self
+    {
+        return self::fromNanoseconds($days * self::MULT_DAYS);
     }
 
     public static function fromInterval(\DateInterval $interval): self
