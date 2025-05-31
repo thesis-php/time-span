@@ -74,6 +74,10 @@ final class TimeSpanTest extends TestCase
      * @param array{days?: float|int, hours?: float|int, minutes?: float|int, seconds?: float|int, milliseconds?: float|int, microseconds?: float|int} $args
      */
     #[TestWith([
+        [],
+        0,
+    ])]
+    #[TestWith([
         ['seconds' => 987, 'milliseconds' => 654, 'microseconds' => 321, 'nanoseconds' => 123],
         987_654_321_123,
     ])]
@@ -175,6 +179,8 @@ final class TimeSpanTest extends TestCase
         TimeSpan::fromInterval($interval);
     }
 
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
     #[TestWith([100, 100])]
     #[TestWith([100.1, 100])]
     #[TestWith([100.5, 101])]
@@ -190,6 +196,8 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expected, $span->toNanoseconds());
     }
 
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
     #[TestWith([100, 100])]
     #[TestWith([100.1, 100])]
     #[TestWith([100.5, 101])]
@@ -201,6 +209,8 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expected, $span->toMicroseconds());
     }
 
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
     #[TestWith([100, 100_000])]
     #[TestWith([100.1, 100_100])]
     #[TestWith([100.5, 100_500])]
@@ -212,6 +222,8 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expected, $span->toMicroseconds());
     }
 
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
     #[TestWith([100, 100_000_000])]
     #[TestWith([100.1, 100_100_000])]
     #[TestWith([100.5, 100_500_000])]
@@ -223,6 +235,8 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expected, $span->toMicroseconds());
     }
 
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
     #[TestWith([100, 6_000_000_000])]
     #[TestWith([100.1, 6_006_000_000])]
     #[TestWith([100.5, 6_030_000_000])]
@@ -234,6 +248,8 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expected, $span->toMicroseconds());
     }
 
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
     #[TestWith([100, 360_000_000_000])]
     #[TestWith([100.1, 360_360_000_000])]
     #[TestWith([100.5, 361_800_000_000])]
@@ -245,6 +261,8 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expected, $span->toMicroseconds());
     }
 
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
     #[TestWith([100, 8_640_000_000_000_000])]
     #[TestWith([106751, 9_223_286_400_000_000_000])]
     #[TestWith([-106751, -9_223_286_400_000_000_000])]

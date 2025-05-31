@@ -93,39 +93,20 @@ final readonly class TimeSpan
             return new self($nanoseconds);
         }
 
-        if ($value >= 0) {
-            /** @var non-empty-string */
-            static $max = (string) PHP_INT_MAX;
-            /**
-             * @var non-empty-string
-             * @psalm-suppress UnusedFunctionCall
-             */
-            static $positiveFormat = \sprintf("%%'0%s.0f", \strlen($max));
+        $nanoseconds = \sprintf('%.0f', round($value * $multiplier));
 
-            $nanoseconds = \sprintf($positiveFormat, round($value * $multiplier));
-
-            if (\strlen($nanoseconds) > \strlen($max) || strcmp($nanoseconds, $max) > 0) {
-                throw new \OutOfBoundsException('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
-            }
-
-            return new self((int) $nanoseconds);
-        }
-
-        /** @var non-empty-string */
-        static $min = (string) PHP_INT_MIN;
-        /**
-         * @var non-empty-string
-         * @psalm-suppress UnusedFunctionCall
-         */
-        static $negativeFormat = \sprintf("%%'0%s.0f", \strlen($min));
-
-        $nanoseconds = \sprintf($negativeFormat, round($value * $multiplier));
-
-        if (\strlen($nanoseconds) > \strlen($min) || strcmp($nanoseconds, $min) > 0) {
+        if ($value > 0 && self::compareUnsignedNumericStrings($nanoseconds, (string) PHP_INT_MAX) > 0
+            || $value < 0 && self::compareUnsignedNumericStrings($nanoseconds, (string) PHP_INT_MIN) > 0
+        ) {
             throw new \OutOfBoundsException('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
         }
 
         return new self((int) $nanoseconds);
+    }
+
+    private static function compareUnsignedNumericStrings(string $a, string $b): int
+    {
+        return \strlen($a) <=> \strlen($b) ?: strcmp($a, $b);
     }
 
     public static function fromInterval(\DateInterval $interval): self
