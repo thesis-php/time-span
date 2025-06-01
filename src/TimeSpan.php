@@ -10,12 +10,12 @@ namespace Thesis\Time;
 final readonly class TimeSpan
 {
     private const int MULT_NANOSECONDS = 1;
-    private const int MULT_MICROSECONDS = self::MULT_NANOSECONDS * 1000;
-    private const int MULT_MILLISECONDS = self::MULT_MICROSECONDS * 1000;
-    private const int MULT_SECONDS = self::MULT_MILLISECONDS * 1000;
-    private const int MULT_MINUTES = self::MULT_SECONDS * 60;
-    private const int MULT_HOURS = self::MULT_MINUTES * 60;
-    private const int MULT_DAYS = self::MULT_HOURS * 24;
+    private const int MULT_MICROSECONDS = 1_000;
+    private const int MULT_MILLISECONDS = 1_000_000;
+    private const int MULT_SECONDS = 1_000_000_000;
+    private const int MULT_MINUTES = 60_000_000_000;
+    private const int MULT_HOURS = 3_600_000_000_000;
+    private const int MULT_DAYS = 86_400_000_000_000;
 
     public static function diff(\DateTimeImmutable $a, \DateTimeImmutable $b): self
     {
