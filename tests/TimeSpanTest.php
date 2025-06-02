@@ -90,7 +90,7 @@ final class TimeSpanTest extends TestCase
         650_975_222_333_123,
     ])]
     #[TestWith([
-        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'nanoseconds' => 10000],
+        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'nanoseconds' => 10_000],
         650_975_222_010_000,
     ])]
     #[TestWith([
@@ -184,11 +184,11 @@ final class TimeSpanTest extends TestCase
     #[TestWith([100, 100])]
     #[TestWith([100.1, 100])]
     #[TestWith([100.5, 101])]
-    #[TestWith([100.99_999, 101])]
+    #[TestWith([100.999_99, 101])]
     #[TestWith([PHP_INT_MAX, PHP_INT_MAX])]
     #[TestWith([PHP_INT_MIN, PHP_INT_MIN])]
-    #[TestWith([9223372036854775000.0, 9223372036854774784])]
-    #[TestWith([-9223372036854775000.0, -9223372036854774784])]
+    #[TestWith([9_223_372_036_854_775_000.0, 9_223_372_036_854_774_784])]
+    #[TestWith([-9_223_372_036_854_775_000.0, -9_223_372_036_854_774_784])]
     public function testFromNanoseconds(int|float $nanoseconds, int $expected): void
     {
         $span = TimeSpan::fromNanoseconds($nanoseconds);
@@ -201,7 +201,7 @@ final class TimeSpanTest extends TestCase
     #[TestWith([100, 100])]
     #[TestWith([100.1, 100])]
     #[TestWith([100.5, 101])]
-    #[TestWith([100.99_999, 101])]
+    #[TestWith([100.999_99, 101])]
     public function testFromMicroseconds(int|float $microseconds, int $expected): void
     {
         $span = TimeSpan::fromMicroseconds($microseconds);
@@ -214,7 +214,7 @@ final class TimeSpanTest extends TestCase
     #[TestWith([100, 100_000])]
     #[TestWith([100.1, 100_100])]
     #[TestWith([100.5, 100_500])]
-    #[TestWith([100.99_999, 101_000])]
+    #[TestWith([100.999_99, 101_000])]
     public function testFromMilliseconds(int|float $milliseconds, int $expected): void
     {
         $span = TimeSpan::fromMilliseconds($milliseconds);
@@ -227,7 +227,7 @@ final class TimeSpanTest extends TestCase
     #[TestWith([100, 100_000_000])]
     #[TestWith([100.1, 100_100_000])]
     #[TestWith([100.5, 100_500_000])]
-    #[TestWith([100.99_999, 100_999_990])]
+    #[TestWith([100.999_99, 100_999_990])]
     public function testFromSeconds(int|float $seconds, int $expected): void
     {
         $span = TimeSpan::fromSeconds($seconds);
@@ -240,7 +240,7 @@ final class TimeSpanTest extends TestCase
     #[TestWith([100, 6_000_000_000])]
     #[TestWith([100.1, 6_006_000_000])]
     #[TestWith([100.5, 6_030_000_000])]
-    #[TestWith([100.99_999, 6_059_999_400])]
+    #[TestWith([100.999_99, 6_059_999_400])]
     public function testFromMinutes(int|float $minutes, int $expected): void
     {
         $span = TimeSpan::fromMinutes($minutes);
@@ -253,7 +253,7 @@ final class TimeSpanTest extends TestCase
     #[TestWith([100, 360_000_000_000])]
     #[TestWith([100.1, 360_360_000_000])]
     #[TestWith([100.5, 361_800_000_000])]
-    #[TestWith([100.99_999, 363_599_964_000])]
+    #[TestWith([100.999_99, 363_599_964_000])]
     public function testFromHours(int|float $hours, int $expected): void
     {
         $span = TimeSpan::fromHours($hours);
@@ -264,10 +264,10 @@ final class TimeSpanTest extends TestCase
     #[TestWith([0, 0])]
     #[TestWith([0.0, 0])]
     #[TestWith([100, 8_640_000_000_000_000])]
-    #[TestWith([106751, 9_223_286_400_000_000_000])]
-    #[TestWith([-106751, -9_223_286_400_000_000_000])]
-    #[TestWith([106751.991167300628148950636386871337890625, 9223372036854774784])]
-    #[TestWith([-106751.991167300628148950636386871337890625, -9223372036854774784])]
+    #[TestWith([106_751, 9_223_286_400_000_000_000])]
+    #[TestWith([-106_751, -9_223_286_400_000_000_000])]
+    #[TestWith([106_751.991_167_300_628_148_950_636_386_871_337_890_625, 9_223_372_036_854_774_784])]
+    #[TestWith([-106_751.991_167_300_628_148_950_636_386_871_337_890_625, -9_223_372_036_854_774_784])]
     public function testFromDays(int|float $days, int $expected): void
     {
         $span = TimeSpan::fromDays($days);
@@ -278,7 +278,7 @@ final class TimeSpanTest extends TestCase
     #[RequiresPhp('<8.4')]
     #[TestWith([100.1, 8_648_640_000_000_000])]
     #[TestWith([100.5, 8_683_200_000_000_000])]
-    #[TestWith([100.99_999, 8_726_399_136_000_000])]
+    #[TestWith([100.999_99, 8_726_399_136_000_000])]
     public function testFromDaysPHPBefore84(float $days, int $expected): void
     {
         $span = TimeSpan::fromDays($days);
@@ -289,7 +289,7 @@ final class TimeSpanTest extends TestCase
     #[RequiresPhp('>=8.4')]
     #[TestWith([100.1, 8_648_640_000_000_001])]
     #[TestWith([100.5, 8_683_200_000_000_001])]
-    #[TestWith([100.99_999, 8_726_399_136_000_001])]
+    #[TestWith([100.999_99, 8_726_399_136_000_001])]
     public function testFromDaysPHPSince84(float $days, int $expected): void
     {
         $span = TimeSpan::fromDays($days);
@@ -297,10 +297,10 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expected, $span->toNanoseconds());
     }
 
-    #[TestWith([106752])]
-    #[TestWith([106751.9912])]
-    #[TestWith([-106752])]
-    #[TestWith([-106751.9912])]
+    #[TestWith([106_752])]
+    #[TestWith([106_751.991_2])]
+    #[TestWith([-106_752])]
+    #[TestWith([-106_751.991_2])]
     public function testFromDaysThrowsOutOfBounds(int|float $days): void
     {
         $this->expectException(\OutOfBoundsException::class);
@@ -604,10 +604,10 @@ final class TimeSpanTest extends TestCase
         $span->mul(2);
     }
 
-    #[TestWith([8_640_000_000_000, 1000, 8_640_000_000])]
-    #[TestWith([1_111_111_111_111, 3, 3_703_703_703_70])]
-    #[TestWith([1_111_111_111_111, 4, 2_777_777_777_78])]
-    #[TestWith([8_640_000_00, 0.1, 8_640_000_000])]
+    #[TestWith([8_640_000_000_000, 1_000, 8_640_000_000])]
+    #[TestWith([1_111_111_111_111, 3, 370_370_370_370])]
+    #[TestWith([1_111_111_111_111, 4, 277_777_777_778])]
+    #[TestWith([864_000_000, 0.1, 8_640_000_000])]
     public function testDiv(int $nanoseconds, int|float $factor, int $nanosecondsQuotient): void
     {
         $span = TimeSpan::fromNanoseconds($nanoseconds);
