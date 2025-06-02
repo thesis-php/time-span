@@ -548,7 +548,7 @@ final class TimeSpanTest extends TestCase
     {
         self::expectException(\OutOfBoundsException::class);
 
-        $tooManyDays = 99999;
+        $tooManyDays = 99_999;
         $firstSpan = TimeSpan::fromDays($tooManyDays);
         $secondSpan = TimeSpan::fromDays($tooManyDays);
 
@@ -573,7 +573,7 @@ final class TimeSpanTest extends TestCase
     {
         self::expectException(\OutOfBoundsException::class);
 
-        $tooManyDays = 99999;
+        $tooManyDays = 99_999;
         $zeroSpan = TimeSpan::fromDays(0);
         $subSpan = TimeSpan::fromDays($tooManyDays);
 
@@ -598,7 +598,7 @@ final class TimeSpanTest extends TestCase
     {
         self::expectException(\OutOfBoundsException::class);
 
-        $tooManyDays = 99999;
+        $tooManyDays = 99_999;
         $span = TimeSpan::fromDays($tooManyDays);
 
         $span->mul(2);
@@ -621,7 +621,7 @@ final class TimeSpanTest extends TestCase
     {
         self::expectException(\OutOfBoundsException::class);
 
-        $tooManyDays = 99999;
+        $tooManyDays = 99_999;
         $span = TimeSpan::fromDays($tooManyDays);
 
         $span->div(0.1);
