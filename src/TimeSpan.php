@@ -50,8 +50,8 @@ final readonly class TimeSpan
 
         $nanoseconds = \sprintf('%.0f', round($nanoseconds));
 
-        if ($nanoseconds > 0 && self::compareUnsignedNumericStrings($nanoseconds, (string) PHP_INT_MAX) > 0
-            || $nanoseconds < 0 && self::compareUnsignedNumericStrings($nanoseconds, (string) PHP_INT_MIN) > 0
+        if ($nanoseconds > 0 && self::comparePositiveNumericStrings($nanoseconds, (string) PHP_INT_MAX) > 0
+            || $nanoseconds < 0 && self::compareNegativeNumericStrings($nanoseconds, (string) PHP_INT_MIN) < 0
         ) {
             throw new \OutOfBoundsException('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
         }
@@ -59,9 +59,14 @@ final readonly class TimeSpan
         return new self((int) $nanoseconds);
     }
 
-    private static function compareUnsignedNumericStrings(string $a, string $b): int
+    private static function comparePositiveNumericStrings(string $a, string $b): int
     {
         return \strlen($a) <=> \strlen($b) ?: strcmp($a, $b);
+    }
+
+    private static function compareNegativeNumericStrings(string $a, string $b): int
+    {
+        return -(\strlen($a) <=> \strlen($b) ?: strcmp($a, $b));
     }
 
     public static function fromMicroseconds(int|float $microseconds): self
