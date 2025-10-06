@@ -179,6 +179,27 @@ final class TimeSpanTest extends TestCase
         TimeSpan::fromInterval($interval);
     }
 
+    #[TestWith([0])]
+    #[TestWith([100])]
+    #[TestWith([-100])]
+    #[TestWith([PHP_INT_MAX])]
+    #[TestWith([PHP_INT_MIN])]
+    #[TestWith([9_223_372_036_854_775_000])]
+    #[TestWith([-9_223_372_036_854_775_000])]
+    public function testConstructor(int $nanoseconds): void
+    {
+        $span = new TimeSpan($nanoseconds);
+
+        self::assertSame($nanoseconds, $span->toNanoseconds());
+    }
+
+    public function testConstructorWithoutArgs(): void
+    {
+        $span = new TimeSpan();
+
+        self::assertSame(0, $span->toNanoseconds());
+    }
+
     #[TestWith([0, 0])]
     #[TestWith([0.0, 0])]
     #[TestWith([100, 100])]
