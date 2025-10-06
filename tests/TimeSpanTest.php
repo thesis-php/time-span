@@ -193,6 +193,13 @@ final class TimeSpanTest extends TestCase
         self::assertSame($nanoseconds, $span->toNanoseconds());
     }
 
+    public function testConstructorWithoutArgs(): void
+    {
+        $span = new TimeSpan();
+
+        self::assertSame(0, $span->toNanoseconds());
+    }
+
     #[TestWith([0, 0])]
     #[TestWith([0.0, 0])]
     #[TestWith([100, 100])]
