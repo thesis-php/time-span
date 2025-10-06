@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.3] - 2025-10-06
 
+### Added
+
+- New methods: `TimeSpan::add()`, `TimeSpan::sub()`, `TimeSpan::mul()`, `TimeSpan::div()` (#18).
+
 ### Changed
 
-- Make `TimeSpan::__construct()` public (#20).
+- `TimeSpan::__construct()` is public (#20).
 
 ## [0.2.2] - 2025-05-30
 
@@ -19,8 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Math methods: `TimeSpan::abs()`, `TimeSpan::negated()`, `TimeSpan::compareTo()`, `TimeSpan::isEqualTo()`,
   `TimeSpan::isLessThan()`, `TimeSpan::isLessThanOrEqualTo()`, `TimeSpan::isZero()`,
   `TimeSpan::isGreaterThanOrEqualTo()`, `TimeSpan::isGreaterThan()`, `TimeSpan::isNegative()`,
-  `TimeSpan::isNegativeOrZero()`, `TimeSpan::isPositive()`, `TimeSpan::isPositiveOrZero()`, `TimeSpan::add()`,
-  `TimeSpan::sub()`, `TimeSpan::mul()`, `TimeSpan::div()` (#14).
+  `TimeSpan::isNegativeOrZero()`, `TimeSpan::isPositive()`, `TimeSpan::isPositiveOrZero()` (#14).
 - `TimeSpan::format()` (#17).
 
 ## [0.2.1] - 2025-05-13
