@@ -135,8 +135,8 @@ final readonly class TimeSpan
         return $timeSpan;
     }
 
-    private function __construct(
-        private int $nanoseconds,
+    public function __construct(
+        private int $nanoseconds = 0,
     ) {}
 
     public function toNanoseconds(): int
