@@ -567,7 +567,7 @@ final class TimeSpanTest extends TestCase
 
     public function testAddOverflow(): void
     {
-        self::expectException(\OutOfBoundsException::class);
+        $this->expectException(\OutOfBoundsException::class);
 
         $tooManyDays = 99_999;
         $firstSpan = TimeSpan::fromDays($tooManyDays);
@@ -592,7 +592,7 @@ final class TimeSpanTest extends TestCase
 
     public function testSubOverflow(): void
     {
-        self::expectException(\OutOfBoundsException::class);
+        $this->expectException(\OutOfBoundsException::class);
 
         $tooManyDays = 99_999;
         $zeroSpan = TimeSpan::fromDays(0);
@@ -617,7 +617,7 @@ final class TimeSpanTest extends TestCase
 
     public function testMulOverflow(): void
     {
-        self::expectException(\OutOfBoundsException::class);
+        $this->expectException(\OutOfBoundsException::class);
 
         $tooManyDays = 99_999;
         $span = TimeSpan::fromDays($tooManyDays);
@@ -640,7 +640,7 @@ final class TimeSpanTest extends TestCase
 
     public function testDivOverflow(): void
     {
-        self::expectException(\OutOfBoundsException::class);
+        $this->expectException(\OutOfBoundsException::class);
 
         $tooManyDays = 99_999;
         $span = TimeSpan::fromDays($tooManyDays);
@@ -650,7 +650,7 @@ final class TimeSpanTest extends TestCase
 
     public function testDivByZero(): void
     {
-        self::expectException(\DivisionByZeroError::class);
+        $this->expectException(\DivisionByZeroError::class);
 
         $span = TimeSpan::fromDays(5);
         $span->div(0);
