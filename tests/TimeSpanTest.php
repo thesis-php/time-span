@@ -208,6 +208,7 @@ final class TimeSpanTest extends TestCase
     #[TestWith([100.999_99, 101])]
     #[TestWith([PHP_INT_MAX, PHP_INT_MAX])]
     #[TestWith([PHP_INT_MIN, PHP_INT_MIN])]
+    #[TestWith([PHP_INT_MIN - 1_024, PHP_INT_MIN])]
     #[TestWith([9_223_372_036_854_775_000.0, 9_223_372_036_854_774_784])]
     #[TestWith([-9_223_372_036_854_775_000.0, -9_223_372_036_854_774_784])]
     public function testFromNanoseconds(int|float $nanoseconds, int $expected): void
@@ -322,12 +323,24 @@ final class TimeSpanTest extends TestCase
     #[TestWith([106_751.991_2])]
     #[TestWith([-106_752])]
     #[TestWith([-106_751.991_2])]
+    #[TestWith([NAN])]
+    #[TestWith([INF])]
     public function testFromDaysThrowsOutOfBounds(int|float $days): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
 
         TimeSpan::fromDays($days);
+    }
+
+    #[TestWith([PHP_INT_MAX + 1])]
+    #[TestWith([PHP_INT_MIN - 1_025])]
+    public function testFromNanosecondsThrowsOutOfBounds(float $nanoseconds): void
+    {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
+
+        TimeSpan::fromNanoseconds($nanoseconds);
     }
 
     #[TestWith([100_000, 100.0, 100])]
