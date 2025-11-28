@@ -5,7 +5,7 @@
 ## Installation
 
 ```bash
-composer require your-vendor/time-span
+composer require thesis/time-span
 ```
 
 ## Usage
