@@ -13,7 +13,7 @@ composer require thesis/time-span
 You can create a `TimeSpan` instance using various static factory methods depending on your source unit.
 
 ```php
-use YourVendor\TimeSpan;
+use Thesis\TimeSpan;
 
 // From specific units
 $span = TimeSpan::fromSeconds(90);
