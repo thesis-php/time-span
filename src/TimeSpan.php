@@ -164,8 +164,7 @@ final readonly class TimeSpan
     }
 
     /**
-     * @phpstan-param PHP_ROUND_HALF_UP|PHP_ROUND_HALF_DOWN|PHP_ROUND_HALF_EVEN|PHP_ROUND_HALF_ODD $roundingMode
-     * @psalm-param positive-int $roundingMode
+     * @param int<1, 4> $roundingMode
      * @return ($precision is positive-int ? float : int)
      */
     public function toMicroseconds(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
@@ -174,8 +173,7 @@ final readonly class TimeSpan
     }
 
     /**
-     * @phpstan-param PHP_ROUND_HALF_UP|PHP_ROUND_HALF_DOWN|PHP_ROUND_HALF_EVEN|PHP_ROUND_HALF_ODD $roundingMode
-     * @psalm-param positive-int $roundingMode
+     * @param int<1, 4> $roundingMode
      * @return ($precision is positive-int ? float : int)
      */
     public function toMilliseconds(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
@@ -184,8 +182,7 @@ final readonly class TimeSpan
     }
 
     /**
-     * @phpstan-param PHP_ROUND_HALF_UP|PHP_ROUND_HALF_DOWN|PHP_ROUND_HALF_EVEN|PHP_ROUND_HALF_ODD $roundingMode
-     * @psalm-param positive-int $roundingMode
+     * @param int<1, 4> $roundingMode
      * @return ($precision is positive-int ? float : int)
      */
     public function toSeconds(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
@@ -194,8 +191,7 @@ final readonly class TimeSpan
     }
 
     /**
-     * @phpstan-param PHP_ROUND_HALF_UP|PHP_ROUND_HALF_DOWN|PHP_ROUND_HALF_EVEN|PHP_ROUND_HALF_ODD $roundingMode
-     * @psalm-param positive-int $roundingMode
+     * @param int<1, 4> $roundingMode
      * @return ($precision is positive-int ? float : int)
      */
     public function toMinutes(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
@@ -204,8 +200,7 @@ final readonly class TimeSpan
     }
 
     /**
-     * @phpstan-param PHP_ROUND_HALF_UP|PHP_ROUND_HALF_DOWN|PHP_ROUND_HALF_EVEN|PHP_ROUND_HALF_ODD $roundingMode
-     * @psalm-param positive-int $roundingMode
+     * @param int<1, 4> $roundingMode
      * @return ($precision is positive-int ? float : int)
      */
     public function toHours(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
@@ -214,8 +209,7 @@ final readonly class TimeSpan
     }
 
     /**
-     * @phpstan-param PHP_ROUND_HALF_UP|PHP_ROUND_HALF_DOWN|PHP_ROUND_HALF_EVEN|PHP_ROUND_HALF_ODD $roundingMode
-     * @psalm-param positive-int $roundingMode
+     * @param int<1, 4> $roundingMode
      * @return ($precision is positive-int ? float : int)
      */
     public function toDays(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
@@ -225,8 +219,7 @@ final readonly class TimeSpan
 
     /**
      * @param self::MULT_* $multiplier
-     * @phpstan-param PHP_ROUND_HALF_UP|PHP_ROUND_HALF_DOWN|PHP_ROUND_HALF_EVEN|PHP_ROUND_HALF_ODD $roundingMode
-     * @psalm-param positive-int $roundingMode
+     * @param int<1, 4> $roundingMode
      * @return ($precision is positive-int ? float : int)
      */
     private function toX(int $multiplier, int $precision, int $roundingMode): int|float
