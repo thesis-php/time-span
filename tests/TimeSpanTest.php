@@ -17,9 +17,9 @@ final class TimeSpanTest extends TestCase
     #[TestWith(['@124.00555', '@123.00333', 1_002_220])]
     #[TestWith(['2021-10-31 08:30:00 Europe/London', '2021-10-30 09:00:00 Europe/London', 88_200_000_000])]
     #[TestWith(['2021-10-31 09:00:00 Europe/London', '2021-10-30 09:00:00 Europe/London', 90_000_000_000])]
-    public function testDiff(string $a, string $b, int $expectedDiffUs): void
+    public function testBetween(string $a, string $b, int $expectedDiffUs): void
     {
-        $diff = TimeSpan::diff(new \DateTimeImmutable($a), new \DateTimeImmutable($b));
+        $diff = TimeSpan::between(new \DateTimeImmutable($a), new \DateTimeImmutable($b));
 
         self::assertSame($expectedDiffUs, $diff->toMicroseconds());
     }
@@ -161,7 +161,7 @@ final class TimeSpanTest extends TestCase
         $this->expectExceptionObject(
             new \InvalidArgumentException(
                 \sprintf(
-                    'Month and year cannot be converted to nanoseconds correctly. Use `%s::diff()` instead.',
+                    'Month and year cannot be converted to nanoseconds correctly. Use `%s::between()` instead.',
                     TimeSpan::class,
                 ),
             ),
@@ -179,7 +179,7 @@ final class TimeSpanTest extends TestCase
         $this->expectExceptionObject(
             new \InvalidArgumentException(
                 \sprintf(
-                    'Given interval was obtained from `%s::diff()` and cannot be interpreted correctly due to DST changeovers. Use `%s::diff()` instead.',
+                    'Given interval was obtained from `%s::diff()` and cannot be interpreted correctly due to DST changeovers. Use `%s::between()` instead.',
                     \DateTimeInterface::class,
                     TimeSpan::class,
                 ),

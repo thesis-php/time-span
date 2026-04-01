@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `TimeSpan::between()` as a replacement for `TimeSpan::diff()`.
 - `TimeSpan::hrtime()`.
+
+### Deprecated
+
+- `TimeSpan::diff()`: use `TimeSpan::between()` instead.
 
 ## [0.2.3] - 2025-10-06
 

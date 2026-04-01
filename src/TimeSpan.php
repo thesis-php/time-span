@@ -114,12 +114,20 @@ final readonly class TimeSpan
         return self::fromNanoseconds($days * self::MULT_DAYS);
     }
 
-    public static function diff(\DateTimeImmutable $a, \DateTimeImmutable $b): self
+    public static function between(\DateTimeImmutable $a, \DateTimeImmutable $b): self
     {
         return self::from(
             seconds: (int) $a->format('U') - (int) $b->format('U'),
             microseconds: (int) $a->format('u') - (int) $b->format('u'),
         );
+    }
+
+    /**
+     * @deprecated use {@see self::between()} instead
+     */
+    public static function diff(\DateTimeImmutable $a, \DateTimeImmutable $b): self
+    {
+        return self::between($a, $b);
     }
 
     public static function hrtime(): self
@@ -132,7 +140,7 @@ final readonly class TimeSpan
         if ($interval->m !== 0 || $interval->y !== 0) {
             throw new \InvalidArgumentException(
                 \sprintf(
-                    'Month and year cannot be converted to nanoseconds correctly. Use `%s::diff()` instead.',
+                    'Month and year cannot be converted to nanoseconds correctly. Use `%s::between()` instead.',
                     self::class,
                 ),
             );
@@ -141,7 +149,7 @@ final readonly class TimeSpan
         if ($interval->days !== false) {
             throw new \InvalidArgumentException(
                 \sprintf(
-                    'Given interval was obtained from `%s::diff()` and cannot be interpreted correctly due to DST changeovers. Use `%s::diff()` instead.',
+                    'Given interval was obtained from `%s::diff()` and cannot be interpreted correctly due to DST changeovers. Use `%s::between()` instead.',
                     \DateTimeInterface::class,
                     self::class,
                 ),
