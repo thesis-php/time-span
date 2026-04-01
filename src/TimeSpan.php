@@ -20,7 +20,10 @@ final readonly class TimeSpan
 
     public static function diff(\DateTimeImmutable $a, \DateTimeImmutable $b): self
     {
-        return self::fromMicroseconds((int) $a->format('Uu') - (int) $b->format('Uu'));
+        return self::from(
+            seconds: (int) $a->format('U') - (int) $b->format('U'),
+            microseconds: (int) $a->format('u') - (int) $b->format('u'),
+        );
     }
 
     /**
