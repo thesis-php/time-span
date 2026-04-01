@@ -18,14 +18,6 @@ final readonly class TimeSpan
     private const int MULT_DAYS = self::MULT_HOURS * 24;
     private const float BOUND = 2 ** 63;
 
-    public static function diff(\DateTimeImmutable $a, \DateTimeImmutable $b): self
-    {
-        return self::from(
-            seconds: (int) $a->format('U') - (int) $b->format('U'),
-            microseconds: (int) $a->format('u') - (int) $b->format('u'),
-        );
-    }
-
     /**
      * @throws \OverflowException if the value exceeds the int64 range
      */
@@ -120,6 +112,19 @@ final readonly class TimeSpan
     public static function fromDays(int|float $days): self
     {
         return self::fromNanoseconds($days * self::MULT_DAYS);
+    }
+
+    public static function diff(\DateTimeImmutable $a, \DateTimeImmutable $b): self
+    {
+        return self::from(
+            seconds: (int) $a->format('U') - (int) $b->format('U'),
+            microseconds: (int) $a->format('u') - (int) $b->format('u'),
+        );
+    }
+
+    public static function hrtime(): self
+    {
+        return self::fromNanoseconds(hrtime(true));
     }
 
     public static function fromInterval(\DateInterval $interval): self
