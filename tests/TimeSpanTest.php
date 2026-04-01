@@ -327,7 +327,7 @@ final class TimeSpanTest extends TestCase
     #[TestWith([INF])]
     public function testFromDaysThrowsOutOfBounds(int|float $days): void
     {
-        $this->expectException(\OutOfBoundsException::class);
+        $this->expectException(\OverflowException::class);
         $this->expectExceptionMessage('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
 
         TimeSpan::fromDays($days);
@@ -337,7 +337,7 @@ final class TimeSpanTest extends TestCase
     #[TestWith([PHP_INT_MIN - 1_025])]
     public function testFromNanosecondsThrowsOutOfBounds(float $nanoseconds): void
     {
-        $this->expectException(\OutOfBoundsException::class);
+        $this->expectException(\OverflowException::class);
         $this->expectExceptionMessage('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
 
         TimeSpan::fromNanoseconds($nanoseconds);
@@ -580,7 +580,7 @@ final class TimeSpanTest extends TestCase
 
     public function testAddOverflow(): void
     {
-        $this->expectException(\OutOfBoundsException::class);
+        $this->expectException(\OverflowException::class);
 
         $tooManyDays = 99_999;
         $firstSpan = TimeSpan::fromDays($tooManyDays);
@@ -605,7 +605,7 @@ final class TimeSpanTest extends TestCase
 
     public function testSubOverflow(): void
     {
-        $this->expectException(\OutOfBoundsException::class);
+        $this->expectException(\OverflowException::class);
 
         $tooManyDays = 99_999;
         $zeroSpan = TimeSpan::fromDays(0);
@@ -630,7 +630,7 @@ final class TimeSpanTest extends TestCase
 
     public function testMulOverflow(): void
     {
-        $this->expectException(\OutOfBoundsException::class);
+        $this->expectException(\OverflowException::class);
 
         $tooManyDays = 99_999;
         $span = TimeSpan::fromDays($tooManyDays);
@@ -653,7 +653,7 @@ final class TimeSpanTest extends TestCase
 
     public function testDivOverflow(): void
     {
-        $this->expectException(\OutOfBoundsException::class);
+        $this->expectException(\OverflowException::class);
 
         $tooManyDays = 99_999;
         $span = TimeSpan::fromDays($tooManyDays);

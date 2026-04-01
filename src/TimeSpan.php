@@ -16,12 +16,16 @@ final readonly class TimeSpan
     private const int MULT_MINUTES = self::MULT_SECONDS * 60;
     private const int MULT_HOURS = self::MULT_MINUTES * 60;
     private const int MULT_DAYS = self::MULT_HOURS * 24;
+    private const float BOUND = 2 ** 63;
 
     public static function diff(\DateTimeImmutable $a, \DateTimeImmutable $b): self
     {
         return self::fromMicroseconds((int) $a->format('Uu') - (int) $b->format('Uu'));
     }
 
+    /**
+     * @throws \OverflowException if the value exceeds the int64 range
+     */
     public static function from(
         int|float $days = 0,
         int|float $hours = 0,
@@ -42,6 +46,9 @@ final readonly class TimeSpan
         );
     }
 
+    /**
+     * @throws \OverflowException if the value exceeds the int64 range
+     */
     public static function fromNanoseconds(int|float $nanoseconds): self
     {
         if (\is_int($nanoseconds)) {
@@ -51,7 +58,7 @@ final readonly class TimeSpan
         $nanoseconds = round($nanoseconds);
 
         if (self::isOutOfBounds($nanoseconds)) {
-            throw new \OutOfBoundsException('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
+            throw new \OverflowException('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
         }
 
         return new self((int) $nanoseconds);
@@ -60,35 +67,53 @@ final readonly class TimeSpan
     private static function isOutOfBounds(float $nanoseconds): bool
     {
         return !is_finite($nanoseconds)
-            || $nanoseconds >= ($bound = 2 ** 63)
-            || $nanoseconds < -$bound;
+            || $nanoseconds >= self::BOUND
+            || $nanoseconds < -self::BOUND;
     }
 
+    /**
+     * @throws \OverflowException if the value exceeds the int64 range
+     */
     public static function fromMicroseconds(int|float $microseconds): self
     {
         return self::fromNanoseconds($microseconds * self::MULT_MICROSECONDS);
     }
 
+    /**
+     * @throws \OverflowException if the value exceeds the int64 range
+     */
     public static function fromMilliseconds(int|float $milliseconds): self
     {
         return self::fromNanoseconds($milliseconds * self::MULT_MILLISECONDS);
     }
 
+    /**
+     * @throws \OverflowException if the value exceeds the int64 range
+     */
     public static function fromSeconds(int|float $seconds): self
     {
         return self::fromNanoseconds($seconds * self::MULT_SECONDS);
     }
 
+    /**
+     * @throws \OverflowException if the value exceeds the int64 range
+     */
     public static function fromMinutes(int|float $minutes): self
     {
         return self::fromNanoseconds($minutes * self::MULT_MINUTES);
     }
 
+    /**
+     * @throws \OverflowException if the value exceeds the int64 range
+     */
     public static function fromHours(int|float $hours): self
     {
         return self::fromNanoseconds($hours * self::MULT_HOURS);
     }
 
+    /**
+     * @throws \OverflowException if the value exceeds the int64 range
+     */
     public static function fromDays(int|float $days): self
     {
         return self::fromNanoseconds($days * self::MULT_DAYS);
@@ -288,21 +313,33 @@ final readonly class TimeSpan
         return $this->nanoseconds >= 0;
     }
 
+    /**
+     * @throws \OverflowException if the value exceeds the int64 range
+     */
     public function add(self $timeSpan): self
     {
         return self::fromNanoseconds($this->nanoseconds + $timeSpan->nanoseconds);
     }
 
+    /**
+     * @throws \OverflowException if the value exceeds the int64 range
+     */
     public function sub(self $timeSpan): self
     {
         return self::fromNanoseconds($this->nanoseconds - $timeSpan->nanoseconds);
     }
 
+    /**
+     * @throws \OverflowException if the value exceeds the int64 range
+     */
     public function mul(int|float $times): self
     {
         return self::fromNanoseconds($this->nanoseconds * $times);
     }
 
+    /**
+     * @throws \OverflowException if the value exceeds the int64 range
+     */
     public function div(int|float $factor): self
     {
         return self::fromNanoseconds($this->nanoseconds / $factor);
@@ -357,14 +394,14 @@ final readonly class TimeSpan
 
         foreach ($usedUnits as $unit => $placeholder) {
             $value = (int) floor($remaining / self::UNITS_MULT_MAP[$unit]);
-            $formatedValue = match ($unit) {
+            $formattedValue = match ($unit) {
                 'd' => (string) $value,
                 'h', 'i', 's' => str_pad((string) $value, 2, '0', STR_PAD_LEFT),
                 'ms', 'us', 'ns' => str_pad((string) $value, 3, '0', STR_PAD_LEFT),
             };
             $remaining %= self::UNITS_MULT_MAP[$unit];
 
-            $result = str_replace($placeholder, $formatedValue, $result);
+            $result = str_replace($placeholder, $formattedValue, $result);
         }
 
         if ($this->nanoseconds < 0) {
