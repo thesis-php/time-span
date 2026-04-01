@@ -130,6 +130,16 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expected, $timeSpan->toMicroseconds());
     }
 
+    public function testFromIntervalWithFractionalSeconds(): void
+    {
+        $interval = new \DateInterval('PT1S');
+        $interval->f = 0.5;
+
+        $timeSpan = TimeSpan::fromInterval($interval);
+
+        self::assertSame(1_500_000, $timeSpan->toMicroseconds());
+    }
+
     #[TestWith(['P1W2D', -777_600_000_000])]
     #[TestWith(['P7D', -604_800_000_000])]
     #[TestWith(['PT2S', -2_000_000])]

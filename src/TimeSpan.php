@@ -144,8 +144,7 @@ final readonly class TimeSpan
             days: $interval->d,
             hours: $interval->h,
             minutes: $interval->i,
-            seconds: $interval->s,
-            microseconds: $interval->f,
+            seconds: $interval->s + $interval->f,
         );
 
         if ($interval->invert === 1) {
