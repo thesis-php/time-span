@@ -17,16 +17,20 @@
         "php": "^8.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^12.1.4"
+        "phpunit/phpunit": "^12.1.4",
+        "symfony/var-dumper": "^7.0 || ^8.0"
     },
     "autoload": {
         "psr-4": {
-            "Thesis\\Time\\": "src/"
-        }
+            "Thesis\\": "src/"
+        },
+        "files": [
+            "src/Time/TimeSpan.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Thesis\\Time\\": "tests/"
+            "Thesis\\": "tests/"
         }
     },
     "config": {

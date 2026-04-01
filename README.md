@@ -14,7 +14,7 @@ composer require thesis/time-span
 ## Usage
 
 ```php
-use Thesis\Time\TimeSpan;
+use Thesis\TimeSpan;
 
 $delay = TimeSpan::fromSeconds(25.123);
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Thesis\Time;
+namespace Thesis;
 
 final class FormatsDataProvider
 {

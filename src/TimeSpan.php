@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Thesis\Time;
+namespace Thesis;
 
 /**
  * @api
+ *
+ * @final Do not extend this class, it will be final in 0.3.0
  */
-final readonly class TimeSpan
+readonly class TimeSpan
 {
     private const int MULT_NANOSECONDS = 1;
     private const int MULT_MICROSECONDS = self::MULT_NANOSECONDS * 1_000;

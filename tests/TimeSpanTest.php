@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Thesis\Time;
+namespace Thesis;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;

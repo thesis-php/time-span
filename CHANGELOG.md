@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 - `TimeSpan::diff()`: use `TimeSpan::between()` instead.
+- `Thesis\Time\TimeSpan`: use `Thesis\TimeSpan` instead.
 
 ## [0.2.3] - 2025-10-06
 
