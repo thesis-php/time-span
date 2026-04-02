@@ -10,8 +10,8 @@ An immutable, nanosecond-precise time duration type for PHP 8.3+.
 ```php
 $span = TimeSpan::from(hours: 1, minutes: 30);
 
-echo $span->toMinutes();        // 90
-echo $span->format('%h:%i:%s'); // 01:30:00
+echo $span->toMinutes(); // 90
+echo $span->format();    // 01:30:00
 ```
 
 ## Installation
