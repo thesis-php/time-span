@@ -256,16 +256,16 @@ $span = TimeSpan::from(
     nanoseconds: 700,
 );
 
-$span->format('%d %h:%i:%s.%ms_%us_%ns'); // "1 02:03:04.500_600_700"
-$span->format('%d %h:%i:%s');             // "1 02:03:04"
-$span->format('%d');                      // "1"
-$span->format();                          // "26:03:04"
-$span->format('%h:%i:%s.%ms');            // "26:03:04.500"
-$span->format('%h:%i:%s.%ms_%us_%ns');    // "26:03:04.500_600_700"
-$span->format('%i:%s.%ms_%us_%ns');       // "1563:04.500_600_700"
-$span->format('%ns');                     // "93784500600700"
-$span->format('%h h %h:%i:%s');           // "26 h 26:03:04" (repeated placeholders are fine)
-$span->format('fixed 5 seconds');         // "fixed 5 seconds" (no placeholders — literal string)
+$span->format('%-%d %h:%i:%s.%ms_%us_%ns'); // "1 02:03:04.500_600_700"
+$span->format('%-%d %h:%i:%s');             // "1 02:03:04"
+$span->format('%-%d');                      // "1"
+$span->format();                            // "26:03:04"
+$span->format('%-%h:%i:%s.%ms');            // "26:03:04.500"
+$span->format('%-%h:%i:%s.%ms_%us_%ns');    // "26:03:04.500_600_700"
+$span->format('%-%i:%s.%ms_%us_%ns');       // "1563:04.500_600_700"
+$span->format('%-%ns');                     // "93784500600700"
+$span->format('%-%h h %h:%i:%s');           // "26 h 26:03:04" (repeated placeholders are fine)
+$span->format('fixed 5 seconds');           // "fixed 5 seconds" (no placeholders — literal string)
 ```
 
 The sign is only included when `%-` is explicitly present in the format:
