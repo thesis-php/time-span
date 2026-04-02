@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `TimeSpan::between()` as a replacement for `TimeSpan::diff()`
 - `TimeSpan::hrtime()`
 - `%-` placeholder in `format()`: outputs `-` for negative spans, empty string otherwise
+- `TimeSpan::__toString()`: equivalent to `format()` with the default pattern
 
 ### Changed
 

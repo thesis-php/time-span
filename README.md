@@ -229,6 +229,8 @@ TimeSpan::fromSeconds(5)->negated(); // TimeSpan(-5 seconds)
 
 ## Formatting
 
+### format()
+
 `format()` renders a span as a human-readable string. The default pattern is `%-%h:%i:%s`.
 
 | Placeholder | Unit                  | Width             |
@@ -276,3 +278,17 @@ $span = TimeSpan::fromSeconds(-90);
 $span->format('%-%i:%s'); // "-01:30"
 $span->format('%i:%s');   // "01:30" — no sign without %-
 ```
+
+### __toString()
+
+`__toString()` is equivalent to `format()` with the default pattern:
+
+```php
+$span = TimeSpan::from(hours: 1, minutes: 30);
+
+echo $span; // "01:30:00"
+```
+
+## License
+
+MIT

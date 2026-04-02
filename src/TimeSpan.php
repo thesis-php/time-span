@@ -367,4 +367,13 @@ readonly class TimeSpan
     {
         return strtr($format, calculateFormatReplacements($format, $this->nanoseconds));
     }
+
+    /**
+     * @return non-empty-string
+     */
+    public function __toString(): string
+    {
+        /** @var non-empty-string */
+        return $this->format();
+    }
 }
