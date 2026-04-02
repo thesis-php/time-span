@@ -7,7 +7,7 @@ use PhpCsFixer\Finder;
 use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
 use PHPyh\CodingStandard\PhpCsFixerCodingStandard;
 
-$config = (new Config())
+$config = new Config()
     ->setFinder(
         Finder::create()
             ->in(__DIR__ . '/src')
@@ -19,8 +19,8 @@ $config = (new Config())
     ->setParallelConfig(ParallelConfigFactory::detect())
     ->setCacheFile(__DIR__ . '/var/' . basename(__FILE__) . '.cache');
 
-(new PhpCsFixerCodingStandard())->applyTo($config, [
-    // 'rule' => ['overridden' => 'config'],
+new PhpCsFixerCodingStandard()->applyTo($config, [
+    'final_class' => false,
 ]);
 
 return $config;
