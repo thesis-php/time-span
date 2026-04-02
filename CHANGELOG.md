@@ -9,37 +9,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `TimeSpan::between()` as a replacement for `TimeSpan::diff()`.
-- `TimeSpan::hrtime()`.
+- `TimeSpan::between()` as a replacement for `TimeSpan::diff()`
+- `TimeSpan::hrtime()`
+- `%-` placeholder in `format()`: outputs `-` for negative spans, empty string otherwise
+
+### Changed
+
+- Explicitly require 64-bit PHP in `composer.json`
+- `from*()` methods now throw `OverflowException` instead of `OutOfBoundsException` on overflow
+- **BC break:** `format()` no longer auto-prepends `-` for negative spans — use `%-` explicitly
+- `format()` no longer throws `InvalidArgumentException` for formats without placeholders or with duplicate placeholders
 
 ### Deprecated
 
-- `TimeSpan::diff()`: use `TimeSpan::between()` instead.
-- `Thesis\Time\TimeSpan`: use `Thesis\TimeSpan` instead.
+- `TimeSpan::diff()`: use `TimeSpan::between()` instead
+- `Thesis\Time\TimeSpan`: use `Thesis\TimeSpan` instead
+
+### Fixed
+
+- `fromInterval()`: `DateInterval::$f` (sub-second fraction) is in seconds, not microseconds — was added to `microseconds`, now correctly added to `seconds`
 
 ## [0.2.3] - 2025-10-06
 
 ### Added
 
-- New methods: `TimeSpan::add()`, `TimeSpan::sub()`, `TimeSpan::mul()`, `TimeSpan::div()` (#18).
+- New methods: `TimeSpan::add()`, `TimeSpan::sub()`, `TimeSpan::mul()`, `TimeSpan::div()` (#18)
 
 ### Changed
 
-- `TimeSpan::__construct()` is public (#20).
+- `TimeSpan::__construct()` is public (#20)
 
 ## [0.2.2] - 2025-05-30
 
 ### Added
 
-- `TimeSpan::fromInterval()` (#5).
+- `TimeSpan::fromInterval()` (#5)
 - Math methods: `TimeSpan::abs()`, `TimeSpan::negated()`, `TimeSpan::compareTo()`, `TimeSpan::isEqualTo()`,
   `TimeSpan::isLessThan()`, `TimeSpan::isLessThanOrEqualTo()`, `TimeSpan::isZero()`,
   `TimeSpan::isGreaterThanOrEqualTo()`, `TimeSpan::isGreaterThan()`, `TimeSpan::isNegative()`,
-  `TimeSpan::isNegativeOrZero()`, `TimeSpan::isPositive()`, `TimeSpan::isPositiveOrZero()` (#14).
-- `TimeSpan::format()` (#17).
+  `TimeSpan::isNegativeOrZero()`, `TimeSpan::isPositive()`, `TimeSpan::isPositiveOrZero()` (#14)
+- `TimeSpan::format()` (#17)
 
 ## [0.2.1] - 2025-05-13
 
 ### Changed
 
-- Store in nanoseconds (#7).
+- Store in nanoseconds (#7)

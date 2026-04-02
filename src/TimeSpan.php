@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Thesis;
 
+use Thesis\TimeSpan\Internal\Unit;
+use function Thesis\TimeSpan\Internal\calculateFormatReplacements;
+use function Thesis\TimeSpan\Internal\isCastableToInt;
+
 /**
  * @api
  *
@@ -11,15 +15,6 @@ namespace Thesis;
  */
 readonly class TimeSpan
 {
-    private const int MULT_NANOSECONDS = 1;
-    private const int MULT_MICROSECONDS = self::MULT_NANOSECONDS * 1_000;
-    private const int MULT_MILLISECONDS = self::MULT_MICROSECONDS * 1_000;
-    private const int MULT_SECONDS = self::MULT_MILLISECONDS * 1_000;
-    private const int MULT_MINUTES = self::MULT_SECONDS * 60;
-    private const int MULT_HOURS = self::MULT_MINUTES * 60;
-    private const int MULT_DAYS = self::MULT_HOURS * 24;
-    private const float BOUND = 2 ** 63;
-
     /**
      * @throws \OverflowException if the value exceeds the int64 range
      */
@@ -33,12 +28,12 @@ readonly class TimeSpan
         int|float $nanoseconds = 0,
     ): self {
         return self::fromNanoseconds(
-            $days * self::MULT_DAYS
-            + $hours * self::MULT_HOURS
-            + $minutes * self::MULT_MINUTES
-            + $seconds * self::MULT_SECONDS
-            + $milliseconds * self::MULT_MILLISECONDS
-            + $microseconds * self::MULT_MICROSECONDS
+            $days * Unit::DAYS
+            + $hours * Unit::HOURS
+            + $minutes * Unit::MINUTES
+            + $seconds * Unit::SECONDS
+            + $milliseconds * Unit::MILLISECONDS
+            + $microseconds * Unit::MICROSECONDS
             + $nanoseconds,
         );
     }
@@ -54,18 +49,11 @@ readonly class TimeSpan
 
         $nanoseconds = round($nanoseconds);
 
-        if (self::isOutOfBounds($nanoseconds)) {
-            throw new \OverflowException('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
+        if (isCastableToInt($nanoseconds)) {
+            return new self((int) $nanoseconds);
         }
 
-        return new self((int) $nanoseconds);
-    }
-
-    private static function isOutOfBounds(float $nanoseconds): bool
-    {
-        return !is_finite($nanoseconds)
-            || $nanoseconds >= self::BOUND
-            || $nanoseconds < -self::BOUND;
+        throw new \OverflowException('The specified time span cannot be expressed as integer nanoseconds due to overflow');
     }
 
     /**
@@ -73,7 +61,7 @@ readonly class TimeSpan
      */
     public static function fromMicroseconds(int|float $microseconds): self
     {
-        return self::fromNanoseconds($microseconds * self::MULT_MICROSECONDS);
+        return self::fromNanoseconds($microseconds * Unit::MICROSECONDS);
     }
 
     /**
@@ -81,7 +69,7 @@ readonly class TimeSpan
      */
     public static function fromMilliseconds(int|float $milliseconds): self
     {
-        return self::fromNanoseconds($milliseconds * self::MULT_MILLISECONDS);
+        return self::fromNanoseconds($milliseconds * Unit::MILLISECONDS);
     }
 
     /**
@@ -89,7 +77,7 @@ readonly class TimeSpan
      */
     public static function fromSeconds(int|float $seconds): self
     {
-        return self::fromNanoseconds($seconds * self::MULT_SECONDS);
+        return self::fromNanoseconds($seconds * Unit::SECONDS);
     }
 
     /**
@@ -97,7 +85,7 @@ readonly class TimeSpan
      */
     public static function fromMinutes(int|float $minutes): self
     {
-        return self::fromNanoseconds($minutes * self::MULT_MINUTES);
+        return self::fromNanoseconds($minutes * Unit::MINUTES);
     }
 
     /**
@@ -105,7 +93,7 @@ readonly class TimeSpan
      */
     public static function fromHours(int|float $hours): self
     {
-        return self::fromNanoseconds($hours * self::MULT_HOURS);
+        return self::fromNanoseconds($hours * Unit::HOURS);
     }
 
     /**
@@ -113,7 +101,7 @@ readonly class TimeSpan
      */
     public static function fromDays(int|float $days): self
     {
-        return self::fromNanoseconds($days * self::MULT_DAYS);
+        return self::fromNanoseconds($days * Unit::DAYS);
     }
 
     public static function between(\DateTimeImmutable $a, \DateTimeImmutable $b): self
@@ -137,6 +125,10 @@ readonly class TimeSpan
         return self::fromNanoseconds(hrtime(true));
     }
 
+    /**
+     * @throws \InvalidArgumentException if the interval contains months or years
+     * @throws \InvalidArgumentException if the interval was obtained from {@see \DateTimeInterface::diff()}
+     */
     public static function fromInterval(\DateInterval $interval): self
     {
         if ($interval->m !== 0 || $interval->y !== 0) {
@@ -187,7 +179,7 @@ readonly class TimeSpan
      */
     public function toMicroseconds(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
     {
-        return $this->toX(self::MULT_MICROSECONDS, $precision, $roundingMode);
+        return $this->toX(Unit::MICROSECONDS, $precision, $roundingMode);
     }
 
     /**
@@ -196,7 +188,7 @@ readonly class TimeSpan
      */
     public function toMilliseconds(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
     {
-        return $this->toX(self::MULT_MILLISECONDS, $precision, $roundingMode);
+        return $this->toX(Unit::MILLISECONDS, $precision, $roundingMode);
     }
 
     /**
@@ -205,7 +197,7 @@ readonly class TimeSpan
      */
     public function toSeconds(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
     {
-        return $this->toX(self::MULT_SECONDS, $precision, $roundingMode);
+        return $this->toX(Unit::SECONDS, $precision, $roundingMode);
     }
 
     /**
@@ -214,7 +206,7 @@ readonly class TimeSpan
      */
     public function toMinutes(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
     {
-        return $this->toX(self::MULT_MINUTES, $precision, $roundingMode);
+        return $this->toX(Unit::MINUTES, $precision, $roundingMode);
     }
 
     /**
@@ -223,7 +215,7 @@ readonly class TimeSpan
      */
     public function toHours(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
     {
-        return $this->toX(self::MULT_HOURS, $precision, $roundingMode);
+        return $this->toX(Unit::HOURS, $precision, $roundingMode);
     }
 
     /**
@@ -232,11 +224,10 @@ readonly class TimeSpan
      */
     public function toDays(int $precision = 0, int $roundingMode = PHP_ROUND_HALF_UP): int|float
     {
-        return $this->toX(self::MULT_DAYS, $precision, $roundingMode);
+        return $this->toX(Unit::DAYS, $precision, $roundingMode);
     }
 
     /**
-     * @param self::MULT_* $multiplier
      * @param int<1, 4> $roundingMode
      * @return ($precision is positive-int ? float : int)
      */
@@ -288,11 +279,6 @@ readonly class TimeSpan
         return $this->nanoseconds <= $another->nanoseconds;
     }
 
-    public function isZero(): bool
-    {
-        return $this->nanoseconds === 0;
-    }
-
     public function isGreaterThanOrEqualTo(self $another): bool
     {
         return $this->nanoseconds >= $another->nanoseconds;
@@ -313,14 +299,19 @@ readonly class TimeSpan
         return $this->nanoseconds <= 0;
     }
 
-    public function isPositive(): bool
+    public function isZero(): bool
     {
-        return $this->nanoseconds > 0;
+        return $this->nanoseconds === 0;
     }
 
     public function isPositiveOrZero(): bool
     {
         return $this->nanoseconds >= 0;
+    }
+
+    public function isPositive(): bool
+    {
+        return $this->nanoseconds > 0;
     }
 
     /**
@@ -349,75 +340,31 @@ readonly class TimeSpan
 
     /**
      * @throws \OverflowException if the value exceeds the int64 range
+     * @throws \DivisionByZeroError
      */
     public function div(int|float $factor): self
     {
         return self::fromNanoseconds($this->nanoseconds / $factor);
     }
-    private const array UNITS_MULT_MAP = [
-        'd' => self::MULT_DAYS,
-        'h' => self::MULT_HOURS,
-        'i' => self::MULT_MINUTES,
-        's' => self::MULT_SECONDS,
-        'ms' => self::MULT_MILLISECONDS,
-        'us' => self::MULT_MICROSECONDS,
-        'ns' => self::MULT_NANOSECONDS,
-    ];
-    private const array UNIT_PLACEHOLDERS = [
-        'd' => '%d',
-        'h' => '%h',
-        'i' => '%i',
-        's' => '%s',
-        'ms' => '%ms',
-        'us' => '%us',
-        'ns' => '%ns',
-    ];
 
-    public function format(string $format = '%h:%i:%s'): string
+    /**
+     * Formats the span using placeholders:
+     *
+     *   %-  sign: `-` for negative spans, empty string otherwise
+     *   %d  days (no padding)
+     *   %h  hours (zero-padded to 2)
+     *   %i  minutes (zero-padded to 2)
+     *   %s  seconds (zero-padded to 2)
+     *   %ms milliseconds (zero-padded to 3)
+     *   %us microseconds (zero-padded to 3)
+     *   %ns nanoseconds (zero-padded to 3)
+     *
+     * The largest unit present receives the total cumulative value;
+     * each smaller unit shows the remainder after the larger ones are subtracted.
+     * Placeholders may appear multiple times or not at all.
+     */
+    public function format(string $format = '%-%h:%i:%s'): string
     {
-        $usedUnits = array_filter(self::UNIT_PLACEHOLDERS, static fn(string $unit): bool => str_contains($format, $unit));
-
-        if ($usedUnits === []) {
-            throw new \InvalidArgumentException(
-                \sprintf(
-                    'Given format `%s` is not valid. Available units: %s',
-                    $format,
-                    implode(', ', array_map(static fn(string $unit): string => "`{$unit}`", self::UNIT_PLACEHOLDERS)),
-                ),
-            );
-        }
-
-        foreach ($usedUnits as $placeholder) {
-            if (substr_count($format, $placeholder) > 1) {
-                throw new \InvalidArgumentException(
-                    \sprintf(
-                        'Given format `%s` contains more than one `%s` placeholder',
-                        $format,
-                        $placeholder,
-                    ),
-                );
-            }
-        }
-
-        $remaining = abs($this->nanoseconds);
-        $result = $format;
-
-        foreach ($usedUnits as $unit => $placeholder) {
-            $value = (int) floor($remaining / self::UNITS_MULT_MAP[$unit]);
-            $formattedValue = match ($unit) {
-                'd' => (string) $value,
-                'h', 'i', 's' => str_pad((string) $value, 2, '0', STR_PAD_LEFT),
-                'ms', 'us', 'ns' => str_pad((string) $value, 3, '0', STR_PAD_LEFT),
-            };
-            $remaining %= self::UNITS_MULT_MAP[$unit];
-
-            $result = str_replace($placeholder, $formattedValue, $result);
-        }
-
-        if ($this->nanoseconds < 0) {
-            return '-' . $result;
-        }
-
-        return $result;
+        return strtr($format, calculateFormatReplacements($format, $this->nanoseconds));
     }
 }

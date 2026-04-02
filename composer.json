@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.3"
+        "php-64bit": "^8.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.1.4",
@@ -25,7 +25,9 @@
             "Thesis\\": "src/"
         },
         "files": [
-            "src/Time/TimeSpan.php"
+            "src/Time/TimeSpan.php",
+            "src/TimeSpan/Internal/calculateFormatReplacements.php",
+            "src/TimeSpan/Internal/isCastableToInt.php"
         ]
     },
     "autoload-dev": {

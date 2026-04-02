@@ -13,6 +13,173 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(TimeSpan::class)]
 final class TimeSpanTest extends TestCase
 {
+    /**
+     * @param array{days?: float|int, hours?: float|int, minutes?: float|int, seconds?: float|int, milliseconds?: float|int, microseconds?: float|int} $args
+     */
+    #[TestWith([[], 0])]
+    #[TestWith([['seconds' => 987, 'milliseconds' => 654, 'microseconds' => 321, 'nanoseconds' => 123], 987_654_321_123])]
+    #[TestWith([['milliseconds' => -1.555, 'microseconds' => -445, 'nanoseconds' => -123], -2_000_123])]
+    #[TestWith([['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'microseconds' => 333, 'nanoseconds' => 123], 650_975_222_333_123])]
+    #[TestWith([['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'nanoseconds' => 10_000], 650_975_222_010_000])]
+    #[TestWith([['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222], 650_975_222_000_000])]
+    #[TestWith([['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35], 650_975_000_000_000])]
+    #[TestWith([['days' => 7, 'hours' => 12, 'minutes' => 49], 650_940_000_000_000])]
+    #[TestWith([['days' => 7, 'hours' => 12], 648_000_000_000_000])]
+    #[TestWith([['days' => 7], 604_800_000_000_000])]
+    public function testFrom(array $args, int $expected): void
+    {
+        $span = TimeSpan::from(...$args);
+
+        self::assertSame($expected, $span->toNanoseconds());
+    }
+
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
+    #[TestWith([100, 100])]
+    #[TestWith([100.1, 100])]
+    #[TestWith([100.5, 101])]
+    #[TestWith([100.999_99, 101])]
+    #[TestWith([PHP_INT_MAX, PHP_INT_MAX])]
+    #[TestWith([PHP_INT_MIN, PHP_INT_MIN])]
+    #[TestWith([PHP_INT_MIN - 1_024, PHP_INT_MIN])]
+    #[TestWith([9_223_372_036_854_775_000.0, 9_223_372_036_854_774_784])]
+    #[TestWith([-9_223_372_036_854_775_000.0, -9_223_372_036_854_774_784])]
+    public function testFromNanoseconds(int|float $nanoseconds, int $expected): void
+    {
+        $span = TimeSpan::fromNanoseconds($nanoseconds);
+
+        self::assertSame($expected, $span->toNanoseconds());
+    }
+
+    #[TestWith([PHP_INT_MAX + 1])]
+    #[TestWith([PHP_INT_MIN - 1_025])]
+    public function testFromNanosecondsThrowsOutOfBounds(float $nanoseconds): void
+    {
+        $this->expectException(\OverflowException::class);
+        $this->expectExceptionMessage('The specified time span cannot be expressed as integer nanoseconds due to overflow');
+
+        TimeSpan::fromNanoseconds($nanoseconds);
+    }
+
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
+    #[TestWith([100, 100])]
+    #[TestWith([100.1, 100])]
+    #[TestWith([100.5, 101])]
+    #[TestWith([100.999_99, 101])]
+    public function testFromMicroseconds(int|float $microseconds, int $expected): void
+    {
+        $span = TimeSpan::fromMicroseconds($microseconds);
+
+        self::assertSame($expected, $span->toMicroseconds());
+    }
+
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
+    #[TestWith([100, 100_000])]
+    #[TestWith([100.1, 100_100])]
+    #[TestWith([100.5, 100_500])]
+    #[TestWith([100.999_99, 101_000])]
+    public function testFromMilliseconds(int|float $milliseconds, int $expected): void
+    {
+        $span = TimeSpan::fromMilliseconds($milliseconds);
+
+        self::assertSame($expected, $span->toMicroseconds());
+    }
+
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
+    #[TestWith([100, 100_000_000])]
+    #[TestWith([100.1, 100_100_000])]
+    #[TestWith([100.5, 100_500_000])]
+    #[TestWith([100.999_99, 100_999_990])]
+    public function testFromSeconds(int|float $seconds, int $expected): void
+    {
+        $span = TimeSpan::fromSeconds($seconds);
+
+        self::assertSame($expected, $span->toMicroseconds());
+    }
+
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
+    #[TestWith([100, 6_000_000_000])]
+    #[TestWith([100.1, 6_006_000_000])]
+    #[TestWith([100.5, 6_030_000_000])]
+    #[TestWith([100.999_99, 6_059_999_400])]
+    public function testFromMinutes(int|float $minutes, int $expected): void
+    {
+        $span = TimeSpan::fromMinutes($minutes);
+
+        self::assertSame($expected, $span->toMicroseconds());
+    }
+
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
+    #[TestWith([100, 360_000_000_000])]
+    #[TestWith([100.1, 360_360_000_000])]
+    #[TestWith([100.5, 361_800_000_000])]
+    #[TestWith([100.999_99, 363_599_964_000])]
+    public function testFromHours(int|float $hours, int $expected): void
+    {
+        $span = TimeSpan::fromHours($hours);
+
+        self::assertSame($expected, $span->toMicroseconds());
+    }
+
+    #[TestWith([0, 0])]
+    #[TestWith([0.0, 0])]
+    #[TestWith([100, 8_640_000_000_000_000])]
+    #[TestWith([106_751, 9_223_286_400_000_000_000])]
+    #[TestWith([-106_751, -9_223_286_400_000_000_000])]
+    #[TestWith([106_751.991_167_300_628_148_950_636_386_871_337_890_625, 9_223_372_036_854_774_784])]
+    #[TestWith([-106_751.991_167_300_628_148_950_636_386_871_337_890_625, -9_223_372_036_854_774_784])]
+    public function testFromDays(int|float $days, int $expected): void
+    {
+        $span = TimeSpan::fromDays($days);
+
+        self::assertSame($expected, $span->toNanoseconds());
+    }
+
+    /**
+     * Float multiplication of days × Unit::DAYS hits the ~15-digit float precision limit.
+     * PHP 8.4 fixed edge cases in round(), shifting borderline values by 1 nanosecond.
+     */
+    #[RequiresPhp('<8.4')]
+    #[TestWith([100.1, 8_648_640_000_000_000])]
+    #[TestWith([100.5, 8_683_200_000_000_000])]
+    #[TestWith([100.999_99, 8_726_399_136_000_000])]
+    public function testFromDaysPHPBefore84(float $days, int $expected): void
+    {
+        $span = TimeSpan::fromDays($days);
+
+        self::assertSame($expected, $span->toNanoseconds());
+    }
+
+    #[RequiresPhp('>=8.4')]
+    #[TestWith([100.1, 8_648_640_000_000_001])]
+    #[TestWith([100.5, 8_683_200_000_000_001])]
+    #[TestWith([100.999_99, 8_726_399_136_000_001])]
+    public function testFromDaysPHPSince84(float $days, int $expected): void
+    {
+        $span = TimeSpan::fromDays($days);
+
+        self::assertSame($expected, $span->toNanoseconds());
+    }
+
+    #[TestWith([106_752])]
+    #[TestWith([106_751.991_2])]
+    #[TestWith([-106_752])]
+    #[TestWith([-106_751.991_2])]
+    #[TestWith([NAN])]
+    #[TestWith([INF])]
+    public function testFromDaysThrowsOutOfBounds(int|float $days): void
+    {
+        $this->expectException(\OverflowException::class);
+        $this->expectExceptionMessage('The specified time span cannot be expressed as integer nanoseconds due to overflow');
+
+        TimeSpan::fromDays($days);
+    }
+
     #[TestWith(['@123.00333', '@124.00555', -1_002_220])]
     #[TestWith(['@124.00555', '@123.00333', 1_002_220])]
     #[TestWith(['2021-10-31 08:30:00 Europe/London', '2021-10-30 09:00:00 Europe/London', 88_200_000_000])]
@@ -22,102 +189,6 @@ final class TimeSpanTest extends TestCase
         $diff = TimeSpan::between(new \DateTimeImmutable($a), new \DateTimeImmutable($b));
 
         self::assertSame($expectedDiffUs, $diff->toMicroseconds());
-    }
-
-    #[DataProviderExternal(FormatsDataProvider::class, 'formats')]
-    public function testFormat(string $format, int $nanoseconds, string $expected): void
-    {
-        $timeSpan = TimeSpan::fromNanoseconds($nanoseconds);
-
-        $timeSpanFormated = $timeSpan->format($format);
-
-        self::assertSame($expected, $timeSpanFormated);
-    }
-
-    public function testItThrowsForInvalidFormatWithOutPlaceholders(): void
-    {
-        $format = 'some text without placeholders';
-        $timeSpan = TimeSpan::fromNanoseconds(123);
-
-        $this->expectExceptionObject(
-            new \InvalidArgumentException(
-                \sprintf(
-                    'Given format `%s` is not valid. Available units: `%%d`, `%%h`, `%%i`, `%%s`, `%%ms`, `%%us`, `%%ns`',
-                    $format,
-                ),
-            ),
-        );
-
-        $timeSpan->format($format);
-    }
-
-    public function testItThrowsForInvalidFormatWithRepeatingPlaceholder(): void
-    {
-        $format = '%d %h:%i:%s.%ms_%us_%ns | %h:%i:%s.%ns';
-        $repeatingPlaceholder = '%h';
-        $timeSpan = TimeSpan::fromNanoseconds(123);
-
-        $this->expectExceptionObject(
-            new \InvalidArgumentException(
-                \sprintf(
-                    'Given format `%s` contains more than one `%s` placeholder',
-                    $format,
-                    $repeatingPlaceholder,
-                ),
-            ),
-        );
-
-        $timeSpan->format($format);
-    }
-
-    /**
-     * @param array{days?: float|int, hours?: float|int, minutes?: float|int, seconds?: float|int, milliseconds?: float|int, microseconds?: float|int} $args
-     */
-    #[TestWith([
-        [],
-        0,
-    ])]
-    #[TestWith([
-        ['seconds' => 987, 'milliseconds' => 654, 'microseconds' => 321, 'nanoseconds' => 123],
-        987_654_321_123,
-    ])]
-    #[TestWith([
-        ['milliseconds' => -1.555, 'microseconds' => -445, 'nanoseconds' => -123],
-        -2_000_123,
-    ])]
-    #[TestWith([
-        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'microseconds' => 333, 'nanoseconds' => 123],
-        650_975_222_333_123,
-    ])]
-    #[TestWith([
-        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222, 'nanoseconds' => 10_000],
-        650_975_222_010_000,
-    ])]
-    #[TestWith([
-        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35, 'milliseconds' => 222],
-        650_975_222_000_000,
-    ])]
-    #[TestWith([
-        ['days' => 7, 'hours' => 12, 'minutes' => 49, 'seconds' => 35],
-        650_975_000_000_000,
-    ])]
-    #[TestWith([
-        ['days' => 7, 'hours' => 12, 'minutes' => 49],
-        650_940_000_000_000,
-    ])]
-    #[TestWith([
-        ['days' => 7, 'hours' => 12],
-        648_000_000_000_000,
-    ])]
-    #[TestWith([
-        ['days' => 7],
-        604_800_000_000_000,
-    ])]
-    public function testFrom(array $args, int $expected): void
-    {
-        $timeSpan = TimeSpan::from(...$args);
-
-        self::assertSame($expected, $timeSpan->toNanoseconds());
     }
 
     #[TestWith(['P1W2D', 777_600_000_000])]
@@ -208,149 +279,6 @@ final class TimeSpanTest extends TestCase
         $span = new TimeSpan();
 
         self::assertSame(0, $span->toNanoseconds());
-    }
-
-    #[TestWith([0, 0])]
-    #[TestWith([0.0, 0])]
-    #[TestWith([100, 100])]
-    #[TestWith([100.1, 100])]
-    #[TestWith([100.5, 101])]
-    #[TestWith([100.999_99, 101])]
-    #[TestWith([PHP_INT_MAX, PHP_INT_MAX])]
-    #[TestWith([PHP_INT_MIN, PHP_INT_MIN])]
-    #[TestWith([PHP_INT_MIN - 1_024, PHP_INT_MIN])]
-    #[TestWith([9_223_372_036_854_775_000.0, 9_223_372_036_854_774_784])]
-    #[TestWith([-9_223_372_036_854_775_000.0, -9_223_372_036_854_774_784])]
-    public function testFromNanoseconds(int|float $nanoseconds, int $expected): void
-    {
-        $span = TimeSpan::fromNanoseconds($nanoseconds);
-
-        self::assertSame($expected, $span->toNanoseconds());
-    }
-
-    #[TestWith([0, 0])]
-    #[TestWith([0.0, 0])]
-    #[TestWith([100, 100])]
-    #[TestWith([100.1, 100])]
-    #[TestWith([100.5, 101])]
-    #[TestWith([100.999_99, 101])]
-    public function testFromMicroseconds(int|float $microseconds, int $expected): void
-    {
-        $span = TimeSpan::fromMicroseconds($microseconds);
-
-        self::assertSame($expected, $span->toMicroseconds());
-    }
-
-    #[TestWith([0, 0])]
-    #[TestWith([0.0, 0])]
-    #[TestWith([100, 100_000])]
-    #[TestWith([100.1, 100_100])]
-    #[TestWith([100.5, 100_500])]
-    #[TestWith([100.999_99, 101_000])]
-    public function testFromMilliseconds(int|float $milliseconds, int $expected): void
-    {
-        $span = TimeSpan::fromMilliseconds($milliseconds);
-
-        self::assertSame($expected, $span->toMicroseconds());
-    }
-
-    #[TestWith([0, 0])]
-    #[TestWith([0.0, 0])]
-    #[TestWith([100, 100_000_000])]
-    #[TestWith([100.1, 100_100_000])]
-    #[TestWith([100.5, 100_500_000])]
-    #[TestWith([100.999_99, 100_999_990])]
-    public function testFromSeconds(int|float $seconds, int $expected): void
-    {
-        $span = TimeSpan::fromSeconds($seconds);
-
-        self::assertSame($expected, $span->toMicroseconds());
-    }
-
-    #[TestWith([0, 0])]
-    #[TestWith([0.0, 0])]
-    #[TestWith([100, 6_000_000_000])]
-    #[TestWith([100.1, 6_006_000_000])]
-    #[TestWith([100.5, 6_030_000_000])]
-    #[TestWith([100.999_99, 6_059_999_400])]
-    public function testFromMinutes(int|float $minutes, int $expected): void
-    {
-        $span = TimeSpan::fromMinutes($minutes);
-
-        self::assertSame($expected, $span->toMicroseconds());
-    }
-
-    #[TestWith([0, 0])]
-    #[TestWith([0.0, 0])]
-    #[TestWith([100, 360_000_000_000])]
-    #[TestWith([100.1, 360_360_000_000])]
-    #[TestWith([100.5, 361_800_000_000])]
-    #[TestWith([100.999_99, 363_599_964_000])]
-    public function testFromHours(int|float $hours, int $expected): void
-    {
-        $span = TimeSpan::fromHours($hours);
-
-        self::assertSame($expected, $span->toMicroseconds());
-    }
-
-    #[TestWith([0, 0])]
-    #[TestWith([0.0, 0])]
-    #[TestWith([100, 8_640_000_000_000_000])]
-    #[TestWith([106_751, 9_223_286_400_000_000_000])]
-    #[TestWith([-106_751, -9_223_286_400_000_000_000])]
-    #[TestWith([106_751.991_167_300_628_148_950_636_386_871_337_890_625, 9_223_372_036_854_774_784])]
-    #[TestWith([-106_751.991_167_300_628_148_950_636_386_871_337_890_625, -9_223_372_036_854_774_784])]
-    public function testFromDays(int|float $days, int $expected): void
-    {
-        $span = TimeSpan::fromDays($days);
-
-        self::assertSame($expected, $span->toNanoseconds());
-    }
-
-    #[RequiresPhp('<8.4')]
-    #[TestWith([100.1, 8_648_640_000_000_000])]
-    #[TestWith([100.5, 8_683_200_000_000_000])]
-    #[TestWith([100.999_99, 8_726_399_136_000_000])]
-    public function testFromDaysPHPBefore84(float $days, int $expected): void
-    {
-        $span = TimeSpan::fromDays($days);
-
-        self::assertSame($expected, $span->toNanoseconds());
-    }
-
-    #[RequiresPhp('>=8.4')]
-    #[TestWith([100.1, 8_648_640_000_000_001])]
-    #[TestWith([100.5, 8_683_200_000_000_001])]
-    #[TestWith([100.999_99, 8_726_399_136_000_001])]
-    public function testFromDaysPHPSince84(float $days, int $expected): void
-    {
-        $span = TimeSpan::fromDays($days);
-
-        self::assertSame($expected, $span->toNanoseconds());
-    }
-
-    #[TestWith([106_752])]
-    #[TestWith([106_751.991_2])]
-    #[TestWith([-106_752])]
-    #[TestWith([-106_751.991_2])]
-    #[TestWith([NAN])]
-    #[TestWith([INF])]
-    public function testFromDaysThrowsOutOfBounds(int|float $days): void
-    {
-        $this->expectException(\OverflowException::class);
-        $this->expectExceptionMessage('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
-
-        TimeSpan::fromDays($days);
-    }
-
-    #[TestWith([PHP_INT_MAX + 1])]
-    #[TestWith([PHP_INT_MIN - 1_025])]
-    public function testFromNanosecondsThrowsOutOfBounds(float $nanoseconds): void
-    {
-        $this->expectException(\OverflowException::class);
-        $this->expectExceptionMessage('The specified time span cannot be expressed as integer nanoseconds due to overflow.');
-
-        TimeSpan::fromNanoseconds($nanoseconds);
     }
 
     #[TestWith([100_000, 100.0, 100])]
@@ -488,18 +416,6 @@ final class TimeSpanTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    #[TestWith([-8_640_000_000_000, false])]
-    #[TestWith([8_640_000_000_000, false])]
-    #[TestWith([0, true])]
-    public function testIsZero(int $microseconds, bool $expected): void
-    {
-        $span = TimeSpan::fromMicroseconds($microseconds);
-
-        $actual = $span->isZero();
-
-        self::assertSame($expected, $actual);
-    }
-
     #[TestWith([8_640_000_000_000, 8_640_000_000_000, true])]
     #[TestWith([8_640_000_000_000, 360_000_000_000, true])]
     #[TestWith([360_000_000_000, 8_640_000_000_000, false])]
@@ -551,13 +467,13 @@ final class TimeSpanTest extends TestCase
     }
 
     #[TestWith([-8_640_000_000_000, false])]
-    #[TestWith([8_640_000_000_000, true])]
-    #[TestWith([0, false])]
-    public function testIsPositive(int $microseconds, bool $expected): void
+    #[TestWith([8_640_000_000_000, false])]
+    #[TestWith([0, true])]
+    public function testIsZero(int $microseconds, bool $expected): void
     {
         $span = TimeSpan::fromMicroseconds($microseconds);
 
-        $actual = $span->isPositive();
+        $actual = $span->isZero();
 
         self::assertSame($expected, $actual);
     }
@@ -570,6 +486,18 @@ final class TimeSpanTest extends TestCase
         $span = TimeSpan::fromMicroseconds($microseconds);
 
         $actual = $span->isPositiveOrZero();
+
+        self::assertSame($expected, $actual);
+    }
+
+    #[TestWith([-8_640_000_000_000, false])]
+    #[TestWith([8_640_000_000_000, true])]
+    #[TestWith([0, false])]
+    public function testIsPositive(int $microseconds, bool $expected): void
+    {
+        $span = TimeSpan::fromMicroseconds($microseconds);
+
+        $actual = $span->isPositive();
 
         self::assertSame($expected, $actual);
     }
@@ -677,5 +605,15 @@ final class TimeSpanTest extends TestCase
 
         $span = TimeSpan::fromDays(5);
         $span->div(0);
+    }
+
+    #[DataProviderExternal(FormatsDataProvider::class, 'formats')]
+    public function testFormat(string $format, int $nanoseconds, string $expected): void
+    {
+        $timeSpan = TimeSpan::fromNanoseconds($nanoseconds);
+
+        $formatted = $timeSpan->format($format);
+
+        self::assertSame($expected, $formatted);
     }
 }
